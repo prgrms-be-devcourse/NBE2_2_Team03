@@ -5,6 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "interest")
+@ToString
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,8 +17,11 @@ public class Interest {
     @Column(name = "interest_id", nullable = false, unique = true)
     private Long interestId;
 
+    @ManyToOne
+    @JoinColumn(name = "petition_id", nullable = false)
+    private Petition petition;  // 청원 필드 추가. N:1 연결
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 }
