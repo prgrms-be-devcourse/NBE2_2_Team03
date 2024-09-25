@@ -1,21 +1,9 @@
 package com.example.nbe2_2_team03.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "petition")
@@ -24,7 +12,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
 public class Petition {
 
     @Id
@@ -32,8 +19,9 @@ public class Petition {
     @Column(name = "petition_id")
     private Long petitionId;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)  // Member 객체와 N:1 연결. 회원 삭제 시 청원도 삭제되는 cascade 논의 필요
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @Column(name = "title", nullable = false, length = 1000)    // 청원서 작성 시 제목 길이 제한 1000 Byte
     private String title;
