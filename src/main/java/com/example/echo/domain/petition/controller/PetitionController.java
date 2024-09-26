@@ -1,9 +1,8 @@
-package com.example.nbe2_2_team03.controller;
+package com.example.echo.domain.petition.controller;
 
-import com.example.nbe2_2_team03.dto.request.PetitionRequestDto;
-import com.example.nbe2_2_team03.dto.response.PetitionResponseDto;
-import com.example.nbe2_2_team03.entity.Petition;
-import com.example.nbe2_2_team03.service.PetitionService;
+import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
+import com.example.echo.domain.petition.service.PetitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,31 +1,30 @@
-package com.example.nbe2_2_team03.dto.response;
+package com.example.echo.domain.petition.dto.response;
 
-import com.example.nbe2_2_team03.entity.Category;
-import com.example.nbe2_2_team03.entity.Member;
-import com.example.nbe2_2_team03.entity.Petition;
+import com.example.echo.domain.petition.entity.Category;
+import com.example.echo.domain.petition.entity.Petition;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
 public class PetitionResponseDto {
-    private final Long petitionId;
-    private final Member member;
-    private final String title;
-    private final String content;
-    private final String summary;
-    private final LocalDateTime startDate;
-    private final LocalDateTime endDate;
-    private final Category category;
-    private final String originalUrl;
-    private final String relatedNews;
-    private final Integer likesCount;
-    private final Integer interestCount;
-    private final Integer agreeCount;
+    private Long petitionId;
+    private Long memberId;  // Member 엔티티 대신 ID만 반환
+    private String title;
+    private String content;
+    private String summary;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private Category category;
+    private String originalUrl;
+    private String relatedNews;
+    private Integer likesCount;
+    private Integer interestCount;
+    private Integer agreeCount;
 
     public PetitionResponseDto(Petition petition) {
         this.petitionId = petition.getPetitionId();
-        this.member = petition.getMember();
+        this.memberId = petition.getMember().getMemberId();
         this.title = petition.getTitle();
         this.content = petition.getContent();
         this.summary = petition.getSummary();

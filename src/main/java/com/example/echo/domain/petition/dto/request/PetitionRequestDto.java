@@ -1,7 +1,6 @@
-package com.example.nbe2_2_team03.dto.request;
+package com.example.echo.domain.petition.dto.request;
 
-import com.example.nbe2_2_team03.entity.Category;
-import com.example.nbe2_2_team03.entity.Member;
+import com.example.echo.domain.petition.entity.Category;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class PetitionRequestDto {
-    private Member member;
+    private Long memberId;  // Member 엔티티 대신 ID만 받음
     private String title;
     private String content;
     private String summary;
@@ -19,7 +18,5 @@ public class PetitionRequestDto {
     private Category category;
     private String originalUrl;
     private String relatedNews;
-    private Integer likesCount;
-    private Integer interestCount;
-    private Integer agreeCount;
+    // likesCount, interestCount, agreeCount는 제거 (서버에서 관리)
 }
