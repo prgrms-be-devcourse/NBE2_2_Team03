@@ -25,7 +25,7 @@ public class Member {
     private Long memberId;
 
     @Column(name = "username", nullable = false, length = 255, unique = true)
-    private String username;  // 로그인용 아이디 추가
+    private String username;  // 로그인 유저아이디 추가
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
