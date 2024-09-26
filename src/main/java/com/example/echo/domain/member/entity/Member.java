@@ -15,6 +15,7 @@ import java.util.List;
 @Table(name = "member")
 @ToString
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
