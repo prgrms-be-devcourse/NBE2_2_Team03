@@ -57,5 +57,10 @@ public class Member {
     private List<Interest> interestList = new ArrayList<>();    // 객체 생성 시 빈 리스트 초기화
 
     @OneToMany(mappedBy = "member")
-    private List<Inquiry> inquiryList;
+    @Builder.Default
+    private List<Inquiry> inquiryList = new ArrayList<>();      // Member 객체 생성 시 1:1 문의 비어 있는 리스트 초기화
+
+    public void addInquiry(Inquiry inquiry) {
+        inquiryList.add(inquiry);
+    }
 }
