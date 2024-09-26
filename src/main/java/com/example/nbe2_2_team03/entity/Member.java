@@ -6,10 +6,12 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "member")
+@ToString
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,7 +48,8 @@ public class Member {
     private LocalDateTime createdDate;
 
     @OneToMany(mappedBy = "member")
-    private List<Interest> interestList;
+    @Builder.Default
+    private List<Interest> interestList = new ArrayList<>();    // 객체 생성 시 빈 리스트 초기화
 
     @OneToMany(mappedBy = "member")
     private List<Inquiry> inquiryList;
