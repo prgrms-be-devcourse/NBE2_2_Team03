@@ -1,5 +1,7 @@
-package com.example.nbe2_2_team03.entity;
+package com.example.echo.domain.member.entity;
 
+import com.example.echo.domain.inquiry.entity.Inquiry;
+import com.example.echo.domain.interest.entity.Interest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

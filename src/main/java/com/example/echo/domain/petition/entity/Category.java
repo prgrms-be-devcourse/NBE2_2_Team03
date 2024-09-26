@@ -1,4 +1,4 @@
-package com.example.nbe2_2_team03.entity;
+package com.example.echo.domain.petition.entity;
 
 import lombok.Getter;
 
