@@ -1,5 +1,7 @@
-package com.example.nbe2_2_team03.entity;
+package com.example.echo.domain.interest.entity;
 
+import com.example.echo.domain.member.entity.Member;
+import com.example.echo.domain.petition.entity.Petition;
 import jakarta.persistence.*;
 import lombok.*;
 
