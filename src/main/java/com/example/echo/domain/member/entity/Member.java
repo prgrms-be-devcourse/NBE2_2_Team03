@@ -13,7 +13,6 @@ import java.util.List;
 
 @Entity
 @Table(name = "member")
-@ToString
 @Getter
 @Setter
 @NoArgsConstructor
@@ -63,5 +62,22 @@ public class Member {
 
     public void addInquiry(Inquiry inquiry) {
         inquiryList.add(inquiry);
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "memberId=" + memberId +
+                ", username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phone='" + phone + '\'' +
+                ", avatarImage='" + avatarImage + '\'' +
+                ", role=" + role +
+                ", createdDate=" + createdDate +
+                ", interestListSize=" + interestList.size() +
+                ", inquiryListSize=" + inquiryList.size() +
+                '}';
     }
 }
