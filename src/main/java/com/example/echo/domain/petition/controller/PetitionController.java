@@ -3,7 +3,7 @@ package com.example.echo.domain.petition.controller;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.service.PetitionService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,21 +11,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/petitions")
+@RequiredArgsConstructor
 public class PetitionController {
 
-    @Autowired
-    private PetitionService petitionService;
+    private final PetitionService petitionService;
 
+    // 청원 등록
     @PostMapping
     public ResponseEntity<PetitionResponseDto> createPetition(@RequestBody PetitionRequestDto petitionDto) {
         return ResponseEntity.ok(petitionService.createPetition(petitionDto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<PetitionResponseDto>> getAllPetitions() {
-        return ResponseEntity.ok(petitionService.getAllPetitions());
-    }
-
+    // 청원 단건 조회
     @GetMapping("/{id}")
     public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long id) {
         return petitionService.getPetitionById(id)
@@ -34,6 +31,13 @@ public class PetitionController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // 청원 전체 조회
+    @GetMapping
+    public ResponseEntity<List<PetitionResponseDto>> getAllPetitions() {
+        return ResponseEntity.ok(petitionService.getAllPetitions());
+    }
+
+    // 청원 수정
     @PutMapping("/{id}")
     public ResponseEntity<PetitionResponseDto> updatePetition(@PathVariable Long id, @RequestBody PetitionRequestDto petitionDto) {
         try {
@@ -44,6 +48,7 @@ public class PetitionController {
         }
     }
 
+    // 청원 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePetitionById(@PathVariable Long id) {
         petitionService.deletePetitionById(id);

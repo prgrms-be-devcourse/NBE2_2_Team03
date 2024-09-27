@@ -1,11 +1,12 @@
 package com.example.echo.domain.petition.service;
 
 import com.example.echo.domain.member.entity.Member;
+import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.repository.PetitionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +15,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PetitionService {
 
-    @Autowired
-    private PetitionRepository petitionRepository;
+    private final PetitionRepository petitionRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    private MemberRepository memberRepository;
-
+    // 청원 등록
     @Transactional
     public PetitionResponseDto createPetition(PetitionRequestDto petitionDto) {
         // 청원 등록을 위한 관리자 아이디 검색
@@ -45,17 +45,20 @@ public class PetitionService {
         return new PetitionResponseDto(petitionRepository.save(petition));
     }
 
+    // 청원 단건 조회
+    public Optional<PetitionResponseDto> getPetitionById(Long id) {
+        return petitionRepository.findById(id)
+                .map(PetitionResponseDto::new);
+    }
+
+    // 청원 전체 조회
     public List<PetitionResponseDto> getAllPetitions() {
         return petitionRepository.findAll().stream()
                 .map(PetitionResponseDto::new)
                 .collect(Collectors.toList());
     }
 
-    public Optional<PetitionResponseDto> getPetitionById(Long id) {
-        return petitionRepository.findById(id)
-                .map(PetitionResponseDto::new);
-    }
-
+    // 청원 수정
     @Transactional
     public PetitionResponseDto updatePetition(Long id, PetitionRequestDto updatedPetitionDto) {
         return petitionRepository.findById(id)
@@ -84,6 +87,7 @@ public class PetitionService {
                 .orElseThrow(() -> new RuntimeException("Petition not found with id: " + id));
     }
 
+    // 청원 삭제
     @Transactional
     public void deletePetitionById(Long id) {
         petitionRepository.deleteById(id);
