@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 public class MemberDto {
     private Long memberId;
-    private String username;
+    private String userId; // username에서 userId로 변경
     private String name;
     private String email;
     private String password;
@@ -23,7 +23,7 @@ public class MemberDto {
     public static MemberDto of(Member member){
         return MemberDto.builder()
                 .memberId(member.getMemberId())
-                .username(member.getUsername())
+                .userId(member.getUserId()) // user뒤에 Name을 Id로 변경
                 .name(member.getName())
                 .email(member.getEmail())
                 .password(member.getPassword())
@@ -36,7 +36,7 @@ public class MemberDto {
     public Member toEntity(){
         return Member.builder()
                 .memberId(this.memberId)
-                .username(this.username)
+                .userId(this.userId) // username에서 userId로 변경
                 .name(this.name)
                 .email(this.email)
                 .password(this.password)
