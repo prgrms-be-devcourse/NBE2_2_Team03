@@ -24,8 +24,8 @@ public class MemberService {
     }
 
     //회원 조회
-    public MemberDto getMember(Long id){
-        Member member = memberRepository.findById(id)
+    public MemberDto getMember(Long memberId){  // Long memberId로 변경
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new RuntimeException("회원정보를 찾을수 없습니다."));
         return MemberDto.of(member);
     }
@@ -39,11 +39,11 @@ public class MemberService {
 
     //회원 정보 수정
     @Transactional
-    public MemberDto updateMember(Long id, MemberDto memberDto){
-        Member member = memberRepository.findById(id)
+    public MemberDto updateMember(Long memberId, MemberDto memberDto){ // Long memberId로 변경
+        Member member = memberRepository.findById(memberId)
             .orElseThrow(()-> new RuntimeException("회원정보를 찾을 수 없습니다."));
 
-        member.setUsername(memberDto.getUsername());
+        member.setUserId(memberDto.getUserId()); // userId로 변경
         member.setName(memberDto.getName());
         member.setEmail(memberDto.getEmail());
         member.setPhone(memberDto.getPhone());
@@ -55,8 +55,8 @@ public class MemberService {
 
     //id로 회원 삭제
     @Transactional
-    public void deleteMember(Long id){
-        Member member = memberRepository.findById(id)
+    public void deleteMember(Long memberId){ // Long memberId로 변경
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new RuntimeException("회원 정보를 찾을 수 없습니다."));
         memberRepository.delete(member);
     }
