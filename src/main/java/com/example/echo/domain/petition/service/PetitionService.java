@@ -67,7 +67,7 @@ public class PetitionService {
                     Member member = memberRepository.findById(updatedPetitionDto.getMemberId())
                             .orElseThrow(() -> new RuntimeException("Member not found"));
 
-                    /**
+                    /*
                      * Petition 엔티티에서 Setter를 사용한다면 코드 간소화 가능
                      * 현재 코드의 경우 청원 생성 날짜와 같은 필드가 엔티티에 추가된다면
                      * 업데이트하지 않아야 할 필드도 덮어쓸 수 있는 가능성 있음
