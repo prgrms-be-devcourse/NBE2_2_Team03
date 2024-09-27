@@ -26,8 +26,8 @@ public class Member {
     @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
-    @Column(name = "username", nullable = false, length = 255, unique = true)
-    private String username;  // 로그인 유저아이디 추가
+    @Column(name = "user_id", nullable = false, length = 255, unique = true)
+    private String userId;  // 로그인 유저아이디 추가 username을  userId로 변경
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;

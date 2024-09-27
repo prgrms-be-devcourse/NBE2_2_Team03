@@ -2,7 +2,6 @@ package com.example.echo.domain.member.controller;
 
 import com.example.echo.domain.member.dto.MemberDto;
 import com.example.echo.domain.member.service.MemberService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
-public class MemberContorller {
+public class MemberController {
 
     private final MemberService memberService;
 
@@ -24,9 +23,9 @@ public class MemberContorller {
     }
 
     //id로 회원 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<MemberDto> getMember(@PathVariable Long id){
-        MemberDto memberDto = memberService.getMember(id);
+    @GetMapping("/{memberId}")  // memberId로 변경
+    public ResponseEntity<MemberDto> getMember(@PathVariable Long memberId){
+        MemberDto memberDto = memberService.getMember(memberId);
         return ResponseEntity.ok(memberDto);
     }
 
@@ -38,16 +37,16 @@ public class MemberContorller {
     }
 
     // 회원 수정
-    @PutMapping("/{id}")
-    public ResponseEntity<MemberDto> updateMember(@PathVariable Long id, @RequestBody MemberDto memberDto) {
-        MemberDto updatedMember = memberService.updateMember(id, memberDto);
+    @PutMapping("/{memberId}")  // memberId로 변경
+    public ResponseEntity<MemberDto> updateMember(@PathVariable Long memberId, @RequestBody MemberDto memberDto) {
+        MemberDto updatedMember = memberService.updateMember(memberId, memberDto);
         return ResponseEntity.ok(updatedMember);
     }
 
     // 회원 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
-        memberService.deleteMember(id);
+    @DeleteMapping("/{memberId}")   // memberId로 변경
+    public ResponseEntity<Void> deleteMember(@PathVariable Long memberId) {
+        memberService.deleteMember(memberId);
         return ResponseEntity.noContent().build();
     }
 }
