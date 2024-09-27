@@ -38,34 +38,40 @@ public class PetitionService {
                 .category(petitionDto.getCategory())
                 .originalUrl(petitionDto.getOriginalUrl())
                 .relatedNews(petitionDto.getRelatedNews())
-                .likesCount(0)
-                .interestCount(0)
-                .agreeCount(0)
                 .build();
         return new PetitionResponseDto(petitionRepository.save(petition));
     }
 
     // 청원 단건 조회
-    public Optional<PetitionResponseDto> getPetitionById(Long id) {
-        return petitionRepository.findById(id)
+    public Optional<PetitionResponseDto> getPetitionById(Long petitionId) {
+        return petitionRepository.findById(petitionId)
                 .map(PetitionResponseDto::new);
     }
 
     // 청원 전체 조회
     public List<PetitionResponseDto> getAllPetitions() {
         return petitionRepository.findAll().stream()
+                // 각 Petition 객체에 대해 new PetitionResponseDto(petition)을 수행
                 .map(PetitionResponseDto::new)
+                // 변환된 PetitionResponseDto 객체들을 리스트로 모아서 반환
                 .collect(Collectors.toList());
     }
 
     // 청원 수정
     @Transactional
-    public PetitionResponseDto updatePetition(Long id, PetitionRequestDto updatedPetitionDto) {
-        return petitionRepository.findById(id)
-                .map(petition -> { // Petition 값이 존재할 경우 함수 실행, 값이 없다면 런타임 예외처리
+    public PetitionResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
+        // petitionId로 청원을 조회하고, 존재하지 않으면 예외를 던짐
+        return petitionRepository.findById(petitionId)
+                .map(petition -> {
+                    // 청원을 작성한 회원(관리자)를 조회하고, 없으면 예외를 던짐
                     Member member = memberRepository.findById(updatedPetitionDto.getMemberId())
                             .orElseThrow(() -> new RuntimeException("Member not found"));
 
+                    /**
+                     * Petition 엔티티에서 Setter를 사용한다면 코드 간소화 가능
+                     * 현재 코드의 경우 청원 생성 날짜와 같은 필드가 엔티티에 추가된다면
+                     * 업데이트하지 않아야 할 필드도 덮어쓸 수 있는 가능성 있음
+                     */
                     Petition updatedPetition = Petition.builder()
                             .petitionId(petition.getPetitionId())
                             .member(member)
@@ -84,12 +90,12 @@ public class PetitionService {
 
                     return new PetitionResponseDto(petitionRepository.save(updatedPetition));
                 })
-                .orElseThrow(() -> new RuntimeException("Petition not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Petition not found with id: " + petitionId));
     }
 
     // 청원 삭제
     @Transactional
-    public void deletePetitionById(Long id) {
-        petitionRepository.deleteById(id);
+    public void deletePetitionById(Long petitionId) {
+        petitionRepository.deleteById(petitionId);
     }
 }

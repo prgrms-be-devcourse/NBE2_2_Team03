@@ -68,7 +68,7 @@ public class Member {
     public String toString() {
         return "Member{" +
                 "memberId=" + memberId +
-                ", username='" + username + '\'' +
+                ", userId='" + userId + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +

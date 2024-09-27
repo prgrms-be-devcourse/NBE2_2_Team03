@@ -26,7 +26,6 @@ public class PetitionController {
     @GetMapping("/{id}")
     public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long id) {
         return petitionService.getPetitionById(id)
-                // 값이 존재할 경우, HTTP 상태 코드: 200 OK를 반환
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
