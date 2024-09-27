@@ -50,9 +50,11 @@ public class Petition {
     private String relatedNews;
 
     @Column(name = "likes_count", nullable = false)
+    @Builder.Default
     private Integer likesCount = 0;
 
     @Column(name = "interest_count", nullable = false)
+    @Builder.Default
     private Integer interestCount = 0;
 
     @Column(name = "agree_count")   // 청원 객체 생성 시점엔 동의자수 크롤링 데이터를 받아오지 않아 nullable = true 설정
