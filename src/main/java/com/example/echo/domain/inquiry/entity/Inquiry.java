@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inquiry")
-@ToString
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -69,5 +68,20 @@ public class Inquiry {
         this.replyContent = replyContent;
         this.inquiryStatus = InquiryStatus.RESOLVED;
         this.repliedDate = LocalDateTime.now();
+    }
+
+    @Override
+    public String toString() {
+        return "Inquiry{" +
+                "inquiryId=" + inquiryId +
+                ", memberId=" + member.getMemberId() +
+                ", inquiryCategory=" + inquiryCategory +
+                ", inquiryTitle='" + inquiryTitle + '\'' +
+                ", inquiryContent='" + inquiryContent + '\'' +
+                ", createdDate=" + createdDate +
+                ", replyContent='" + replyContent + '\'' +
+                ", inquiryStatus=" + inquiryStatus +
+                ", repliedDate=" + repliedDate +
+                '}';
     }
 }
