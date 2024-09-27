@@ -30,7 +30,7 @@ public class MemberService {
         return MemberDto.of(member);
     }
 
-    //전체 회원 죄회
+    //전체 회원 조회
     public List<MemberDto> getAllMembers(){
         return memberRepository.findAll().stream()
                 .map(MemberDto::of)

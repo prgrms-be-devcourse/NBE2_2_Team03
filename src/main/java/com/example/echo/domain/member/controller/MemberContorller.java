@@ -2,6 +2,7 @@ package com.example.echo.domain.member.controller;
 
 import com.example.echo.domain.member.dto.MemberDto;
 import com.example.echo.domain.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
