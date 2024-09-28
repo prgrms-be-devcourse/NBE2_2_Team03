@@ -5,8 +5,6 @@ import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
 import com.example.echo.domain.member.dto.response.ProfileImageUpdateResponse;
-import com.example.echo.domain.member.entity.Member;
-import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -85,7 +83,8 @@ public class MemberService {
         member.setAvatarImage(avatarUrl); // 경로 업데이트
 
         // 회원 정보를 저장하고 응답 DTO 생성
-        return ProfileImageUpdateResponse.from(memberRepository.save(member));
+        Member updatedMember = memberRepository.save(member);
+        return ProfileImageUpdateResponse.from(updatedMember);
     }
 
     // 공통 메서드: 회원 ID로 회원 조회

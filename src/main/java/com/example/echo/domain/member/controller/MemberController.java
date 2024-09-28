@@ -7,11 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
 import com.example.echo.domain.member.dto.response.ProfileImageUpdateResponse;
-import com.example.echo.domain.member.service.MemberService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -71,14 +67,17 @@ public class MemberController {
 
     // 프로필 사진 업로드
     @PostMapping("/{id}/avatar")
-    public ResponseEntity<ProfileImageUpdateResponse> uploadAvatar(@PathVariable Long id,
-                                                                   @RequestParam("avatarImage") MultipartFile avatarImage) {
+    public ResponseEntity<ProfileImageUpdateResponse> uploadAvatar(
+            @PathVariable Long id,
+            @RequestParam("avatarImage") MultipartFile avatarImage) {
+
         // ProfileImageUpdateRequest 객체를 수동으로 생성
         ProfileImageUpdateRequest requestDto = new ProfileImageUpdateRequest();
         requestDto.setAvatarImage(avatarImage); // MultipartFile을 요청 DTO에 설정
 
-        ProfileImageUpdateResponse updatedMember = memberService.updateAvatar(id, requestDto);
-        return ResponseEntity.ok(updatedMember);
+        // 프로필 사진 업데이트
+        ProfileImageUpdateResponse responseDto = memberService.updateAvatar(id, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }
 
