@@ -4,7 +4,6 @@ import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.service.PetitionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,11 +23,6 @@ public class PetitionController {
     }
 
     // 청원 단건 조회
-    @GetMapping
-    public ResponseEntity<List<PetitionResponseDto>> getAllPetitions() {
-        return ResponseEntity.ok(petitionService.getAllPetitions());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long id) {
         return petitionService.getPetitionById(id)
@@ -36,7 +30,6 @@ public class PetitionController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
 
     // 청원 전체 조회
     @GetMapping
