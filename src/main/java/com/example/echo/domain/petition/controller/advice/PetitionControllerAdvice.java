@@ -25,12 +25,6 @@ public class PetitionControllerAdvice {
                 .body(Map.of("error", e.getMessage()));
     }
 
-    @ExceptionHandler(PetitionValidationException.class)
-    public ResponseEntity<?> handlePetitionValidationException(PetitionValidationException e) {
-        return ResponseEntity.badRequest()
-                .body(Map.of("error", e.getMessage()));
-    }
-
     @ExceptionHandler(UnauthorizedPetitionActionException.class)
     public ResponseEntity<?> handleUnauthorizedPetitionActionException(UnauthorizedPetitionActionException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)

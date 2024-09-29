@@ -89,25 +89,36 @@ class PetitionServiceTest {
     @DisplayName("청원 수정")
     void updatePetition() {
         // given
-        Petition petition = createPetition(testMember);
-        PetitionRequestDto updateRequest = createPetitionRequest(testMember.getMemberId());
-        updateRequest = PetitionRequestDto.builder()
-                .memberId(updateRequest.getMemberId())
-                .title("수정된 청원")
-                .content(updateRequest.getContent())
-                .summary(updateRequest.getSummary())
-                .startDate(updateRequest.getStartDate())
-                .endDate(updateRequest.getEndDate())
-                .category(updateRequest.getCategory())
-                .originalUrl(updateRequest.getOriginalUrl())
-                .relatedNews(updateRequest.getRelatedNews())
+        Petition petition = createPetition(testMember); // 청원 생성
+        LocalDateTime newStartDate = LocalDateTime.now().plusDays(1);
+        LocalDateTime newEndDate = LocalDateTime.now().plusDays(31);
+
+        PetitionRequestDto updateRequest = PetitionRequestDto.builder() // 청원 수정 요청
+                .memberId(testMember.getMemberId())
+                .title("수정된 청원 제목")
+                .content("수정된 청원 내용")
+                .summary("수정된 청원 요약")
+                .startDate(newStartDate)
+                .endDate(newEndDate)
+                .category(Category.EDUCATION)
+                .originalUrl("http://updated-test.com")
+                .relatedNews("수정된 관련 뉴스")
                 .build();
 
         // when
         PetitionResponseDto updatedPetition = petitionService.updatePetition(petition.getPetitionId(), updateRequest);
 
         // then
-        assertThat(updatedPetition.getTitle()).isEqualTo("수정된 청원");
+        assertThat(updatedPetition.getTitle()).isEqualTo("수정된 청원 제목");
+        assertThat(updatedPetition.getContent()).isEqualTo("수정된 청원 내용");
+        assertThat(updatedPetition.getSummary()).isEqualTo("수정된 청원 요약");
+        // 나노초 단위 무시, 초 단위까지만 테스트
+        assertThat(updatedPetition.getStartDate()).isEqualToIgnoringNanos(newStartDate);
+        assertThat(updatedPetition.getEndDate()).isEqualToIgnoringNanos(newEndDate);
+
+        assertThat(updatedPetition.getCategory()).isEqualTo(Category.EDUCATION);
+        assertThat(updatedPetition.getOriginalUrl()).isEqualTo("http://updated-test.com");
+        assertThat(updatedPetition.getRelatedNews()).isEqualTo("수정된 관련 뉴스");
     }
 
     @Test
