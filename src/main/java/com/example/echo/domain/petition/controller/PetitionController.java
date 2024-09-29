@@ -19,32 +19,29 @@ public class PetitionController {
     // 청원 등록
     @PostMapping
     public ResponseEntity<PetitionResponseDto> createPetition(@RequestBody PetitionRequestDto petitionDto) {
-        return ResponseEntity.ok(petitionService.createPetition(petitionDto));
+        PetitionResponseDto createdPetition = petitionService.createPetition(petitionDto);
+        return ResponseEntity.ok(createdPetition);
     }
 
     // 청원 단건 조회
     @GetMapping("/{id}")
     public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long id) {
-        return petitionService.getPetitionById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        PetitionResponseDto petition = petitionService.getPetitionById(id);
+        return ResponseEntity.ok(petition);
     }
 
     // 청원 전체 조회
     @GetMapping
     public ResponseEntity<List<PetitionResponseDto>> getAllPetitions() {
-        return ResponseEntity.ok(petitionService.getAllPetitions());
+        List<PetitionResponseDto> petitions = petitionService.getAllPetitions();
+        return ResponseEntity.ok(petitions);
     }
 
     // 청원 수정
     @PutMapping("/{id}")
     public ResponseEntity<PetitionResponseDto> updatePetition(@PathVariable Long id, @RequestBody PetitionRequestDto petitionDto) {
-        try {
-            PetitionResponseDto updatedPetition = petitionService.updatePetition(id, petitionDto);
-            return ResponseEntity.ok(updatedPetition);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        PetitionResponseDto updatedPetition = petitionService.updatePetition(id, petitionDto);
+        return ResponseEntity.ok(updatedPetition);
     }
 
     // 청원 삭제

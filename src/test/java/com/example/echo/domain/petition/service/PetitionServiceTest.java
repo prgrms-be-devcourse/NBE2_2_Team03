@@ -64,7 +64,7 @@ class PetitionServiceTest {
         Petition petition = createPetition(testMember);
 
         // when
-        PetitionResponseDto response = petitionService.getPetitionById(petition.getPetitionId()).orElse(null);
+        PetitionResponseDto response = petitionService.getPetitionById(petition.getPetitionId());
 
         // then
         assertThat(response).isNotNull();
