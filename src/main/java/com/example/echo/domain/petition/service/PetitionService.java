@@ -29,18 +29,7 @@ public class PetitionService {
         Member member = memberRepository.findById(petitionDto.getMemberId())
                 .orElseThrow(() -> new MemberNotFoundException(petitionDto.getMemberId()));
 
-        Petition petition = Petition.builder()
-                .member(member)
-                .title(petitionDto.getTitle())
-                .content(petitionDto.getContent())
-                .summary(petitionDto.getSummary())
-                .startDate(petitionDto.getStartDate())
-                .endDate(petitionDto.getEndDate())
-                .category(petitionDto.getCategory())
-                .originalUrl(petitionDto.getOriginalUrl())
-                .relatedNews(petitionDto.getRelatedNews())
-                .build();
-
+        Petition petition = petitionDto.toEntity(member);
         return new PetitionResponseDto(petitionRepository.save(petition));
     }
 
@@ -69,24 +58,8 @@ public class PetitionService {
         Member member = memberRepository.findById(updatedPetitionDto.getMemberId())
                 .orElseThrow(() -> new MemberNotFoundException(updatedPetitionDto.getMemberId()));
 
-        Petition updatedPetition = Petition.builder()
-                .petitionId(existingPetition.getPetitionId()) // 기존 ID 유지
-                .member(member)
-                .title(updatedPetitionDto.getTitle())
-                .content(updatedPetitionDto.getContent())
-                .summary(updatedPetitionDto.getSummary())
-                .startDate(updatedPetitionDto.getStartDate())
-                .endDate(updatedPetitionDto.getEndDate())
-                .category(updatedPetitionDto.getCategory())
-                .originalUrl(updatedPetitionDto.getOriginalUrl())
-                .relatedNews(updatedPetitionDto.getRelatedNews())
-                .likesCount(existingPetition.getLikesCount())  // 기존 값 유지
-                .interestCount(existingPetition.getInterestCount())  // 기존 값 유지
-                .agreeCount(existingPetition.getAgreeCount())  // 기존 값 유지
-                .build();
-
-        Petition savedPetition = petitionRepository.save(updatedPetition);
-        return new PetitionResponseDto(savedPetition);
+        Petition updatedPetition = updatedPetitionDto.toEntityWithExistingData(existingPetition, member);
+        return new PetitionResponseDto(petitionRepository.save(updatedPetition));
     }
 
     // 청원 삭제
