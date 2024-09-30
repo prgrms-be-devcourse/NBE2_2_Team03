@@ -3,6 +3,8 @@ package com.example.echo.domain.member.dto;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 
 @Getter
