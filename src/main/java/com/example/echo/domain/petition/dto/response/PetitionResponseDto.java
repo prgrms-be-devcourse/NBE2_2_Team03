@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Getter
 public class PetitionResponseDto {
     private Long petitionId;
-    private Long memberId;  // Member 엔티티 대신 ID만 반환
+    private Long memberId;
     private String title;
     private String content;
     private String summary;
