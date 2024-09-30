@@ -43,16 +43,7 @@ public class PetitionService {
     }
 
     // 청원 전체 조회
-    public List<PetitionResponseDto> getAllPetitions() {
-        return petitionRepository.findAll().stream()
-                // 각 Petition 객체에 대해 new PetitionResponseDto(petition)을 수행
-                .map(PetitionResponseDto::new)
-                // 변환된 PetitionResponseDto 객체들을 리스트로 모아서 반환
-                .collect(Collectors.toList());
-    }
-
-    // 청원 전체 조회 (페이징 기능 지원)
-    public Page<PetitionResponseDto> getPetitionsByPage(Pageable pageable) {
+    public Page<PetitionResponseDto> getPetitions(Pageable pageable) {
         return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
     }
 
