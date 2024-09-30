@@ -7,19 +7,50 @@ import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
 import com.example.echo.domain.member.dto.response.ProfileImageUpdateResponse;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
+    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
 
     private final UploadUtil uploadUtil;
+
+    //회원 가입
+    public Member signup(Member member) {
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
+        return memberRepository.save(member);
+    }
+
+    //로그인 시 사용자의 정보를 조회
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        Optional<Member> memberOptional = memberRepository.findByUserId(userId);
+        if (memberOptional.isEmpty()) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+        Member member = memberOptional.get();
+
+        // UserDetails 반환 (username, password, 권한)
+        return User.builder()
+                .username(member.getUserId())
+                .password(member.getPassword())
+                .roles(member.getRole().name())
+                .build();
+    }
+
 
     // 회원 등록
     @Transactional
@@ -65,6 +96,17 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new RuntimeException("회원 정보를 찾을 수 없습니다."));
         memberRepository.delete(member);
+    }
+
+    //UserId로 유저 찾기
+    public MemberDto findByUserId(String userId){
+        Optional<Member> memberOpt = memberRepository.findByUserId(userId);
+
+        if (memberOpt.isPresent()){
+            return MemberDto.of(memberOpt.get());
+        }else{
+            throw new RuntimeException("회원이 찾을 수 없습니다 : "+userId);
+        }
     }
 
     // 프로필 사진 조회

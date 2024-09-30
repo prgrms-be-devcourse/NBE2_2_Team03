@@ -58,6 +58,13 @@ public class MemberController {
         return ResponseEntity.noContent().build();
     }
 
+    // UserId로 찾기
+    @GetMapping("/{userId}")
+    public ResponseEntity<MemberDto> getMemberByUserId(@PathVariable String userId){
+        MemberDto memberDto = memberService.findByUserId(userId);
+        return ResponseEntity.ok(memberDto);
+    }
+
     // 프로필 사진 조회
     @GetMapping("/{id}/avatar")
     public ResponseEntity<String> getAvatar(@PathVariable Long id) {
