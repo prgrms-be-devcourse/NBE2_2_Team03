@@ -24,4 +24,16 @@ public class InquiryService {
         Inquiry savedInquiry = inquiryRepository.save(createdInquiry);
         return InquiryResponseDTO.from(savedInquiry);
     }
+
+    // 모든 회원 1:1 문의 단건 조회
+    public InquiryResponseDTO getInquiryById(Long inquiryId) {
+        Inquiry foundInquiry = findInquiryById(inquiryId);
+        return InquiryResponseDTO.from(foundInquiry);
+    }
+
+    // 문의 ID로 문의 조회
+    private Inquiry findInquiryById(Long inquiryId) {
+        return inquiryRepository.findById(inquiryId)
+                .orElseThrow(() -> new RuntimeException("1:1 문의 정보를 찾을 수 없습니다."));
+    }
 }
