@@ -1,22 +1,21 @@
-package com.example.echo.domain.petition.entity;
+package com.example.echo.domain.petition.entity.crawling;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
-@ToString
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PetitionCrawl {
+    // 크롤링해서 얻은 값을 이용해서 재크롤링하여 얻어온 값을 저장하기 위해 생성한 class
+
     // 청원 제목
     private String title;
     // 동의 시작일 종료일
-    private String startDate;
+    // 크롤링만 한 경우 기간으로 값 받는다.
+    // (service 에서 시작일, 종료일 나눠 db에 저장)
+    private String period;
 
     // 분류
     private String category;
@@ -31,5 +30,7 @@ public class PetitionCrawl {
     private String content;
 
     public void changeContent(String content) {this.content = content; }
+
+
 
 }
