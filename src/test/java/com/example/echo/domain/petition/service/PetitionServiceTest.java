@@ -177,13 +177,13 @@ class PetitionServiceTest {
         Petition petition = Petition.builder()
                 .member(member)
                 .title("테스트 청원")
-                .content("테스트 내용")
-                .summary("테스트 요약")
+                .content("테스트 청원 내용")
+                .summary("테스트 청원 요약")
                 .startDate(LocalDateTime.now())
                 .endDate(LocalDateTime.now().plusDays(30))
                 .category(Category.POLITICS)
                 .originalUrl("http://test.com")
-                .relatedNews("테스트 뉴스")
+                .relatedNews("테스트 관련 뉴스")
                 .build();
         return petitionRepository.save(petition);
     }
