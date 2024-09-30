@@ -1,6 +1,5 @@
 package com.example.echo.domain.petition.dto.request;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.PageRequest;
