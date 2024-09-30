@@ -56,7 +56,7 @@ public class PetitionController {
         // Sort.Direction으로 asc 또는 desc로 정렬 방식 설정
         Sort.Direction sortDirection = Sort.Direction.fromString(direction);
         // sortBy 문자열은 실제 엔티티의 필드 이름을 참조: "agreeCount"는 Petition 엔티티의 필드 이름과 일치
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
         return petitionService.getPetitionsByPage(pageable);
     }
 
