@@ -25,7 +25,6 @@ public class MemberService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
-
     private final UploadUtil uploadUtil;
 
     //회원 가입
