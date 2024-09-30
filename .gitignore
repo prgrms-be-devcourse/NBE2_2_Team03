@@ -38,3 +38,9 @@ out/
 
 .env
 application-db.properties
+
+### DS_Store ###
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
