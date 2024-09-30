@@ -27,13 +27,13 @@ public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final UploadUtil uploadUtil;
 
-    //로그인
+    //로그인 패스워드 암호화하여 매칭시키기
     public Member signup(Member member) {
         member.setPassword(passwordEncoder.encode(member.getPassword()));
         return memberRepository.save(member);
     }
 
-    //로그인 시 사용자의 정보를 조회
+    //로그인할때 아이디로 찾는 로직
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         Optional<Member> memberOptional = memberRepository.findByUserId(userId);
