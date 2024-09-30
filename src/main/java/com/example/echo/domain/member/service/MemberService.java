@@ -27,7 +27,7 @@ public class MemberService implements UserDetailsService {
     private final MemberRepository memberRepository;
     private final UploadUtil uploadUtil;
 
-    //회원 가입
+    //로그인
     public Member signup(Member member) {
         member.setPassword(passwordEncoder.encode(member.getPassword()));
         return memberRepository.save(member);
