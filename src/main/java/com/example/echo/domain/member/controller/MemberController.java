@@ -20,6 +20,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    // 로그인 API
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestParam String userId, @RequestParam String password) {
+        String token = memberService.login(userId, password);
+        return ResponseEntity.ok(token);
+    }
+
     //회원 등록
     @PostMapping
     public ResponseEntity<MemberDto> createMember(@Valid @RequestBody MemberDto memberDto){

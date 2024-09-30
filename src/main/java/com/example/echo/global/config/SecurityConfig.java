@@ -28,7 +28,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 사용하지 않음
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/login", "/api/signup").permitAll()  // 로그인, 회원가입은 인증 없이 가능
+                .requestMatchers("/api/login", "/api/signup","/docs/**").permitAll()
                 .anyRequest().authenticated())  // 그 외 요청은 인증 필요
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);  // JWT 필터 추가
 

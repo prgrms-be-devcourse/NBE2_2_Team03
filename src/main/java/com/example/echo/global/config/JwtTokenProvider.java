@@ -17,15 +17,15 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     @Value("${jwt.secret}")
-    private String secretKey;  // application.properties에 설정된 secret key
+    private static String secretKey;  // application.properties에 설정된 secret key
 
     @Value("${jwt.token-validity-in-seconds}")
-    private long tokenValidityInSeconds;  // 토큰 유효 시간
+    private static long tokenValidityInSeconds;  // 토큰 유효 시간
 
     private final UserDetailsService userDetailsService;
 
     // 토큰 생성 메서드
-    public String createToken(String userId, String role) {
+    public static String createToken(String userId, String role) {
         Claims claims = Jwts.claims().setSubject(userId);
         claims.put("role", role);  // 권한 정보 추가
 

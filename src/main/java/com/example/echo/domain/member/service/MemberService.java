@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.example.echo.global.config.JwtTokenProvider;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,26 @@ public class MemberService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
     private final UploadUtil uploadUtil;
+
+
+    // 로그인 로직
+    public String login(String userId, String password) {
+        // 1. 사용자 정보 조회
+        Optional<Member> memberOpt = memberRepository.findByUserId(userId);
+        if (memberOpt.isEmpty()) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+
+        Member member = memberOpt.get();
+
+        // 2. 비밀번호 확인
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. JWT 토큰 생성
+        return JwtTokenProvider.createToken(member.getUserId(), member.getRole().name());
+    }
 
     //로그인 패스워드 암호화하여 매칭시키기
     public Member signup(Member member) {
