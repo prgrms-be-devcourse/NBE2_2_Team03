@@ -10,6 +10,8 @@ import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,11 @@ public class PetitionService {
                 .map(PetitionResponseDto::new)
                 // 변환된 PetitionResponseDto 객체들을 리스트로 모아서 반환
                 .collect(Collectors.toList());
+    }
+
+    // 청원 전체 조회 (페이징 기능 지원)
+    public Page<PetitionResponseDto> getPetitionsByPage(Pageable pageable) {
+        return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
     }
 
     // 청원 수정
