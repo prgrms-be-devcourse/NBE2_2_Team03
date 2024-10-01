@@ -24,7 +24,7 @@ public class PetitionCrawlService {
 
     public String dynamicCrawl(String url) {
         // ChromeDriver 주소
-        System.setProperty("webdriver.chrome.driver", "C:/webprac/chromedriverwin32/chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "C:/webprac/chromedriver-win64/chromedriver.exe");
         // 옵셜 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
@@ -124,7 +124,7 @@ public class PetitionCrawlService {
 
         } catch (Exception e) {
             logger.error("An error occurred: ", e);
-            return null;
+            throw new RuntimeException("크롤링 중 오류가 발생했습니다. 입력한 URL을 확인해 주세요."); // 오류 처리 추가
         } finally {
             driver.quit();
         }
