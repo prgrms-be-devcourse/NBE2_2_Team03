@@ -54,6 +54,7 @@ public class PetitionDataExtractor {
 
     public static Category convertCategory(String category) {
         Category categoryEnum = Category.fromDescription(category); // 해당하는 카테고리 enum 찾기
+
         if (categoryEnum == null) {
             System.out.println("Unknown category: " + category);
         }
