@@ -70,9 +70,10 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     private void setAuthentication(Map<String, Object> claims) {
         String userId = claims.get("userId").toString();
         String[] roles = claims.get("role").toString().split(","); // role이 여러개일 수 있으므로
+        Long memberId = Long.valueOf(claims.get("memberId").toString());
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                new CustomUserPrincipal(userId),
+                new CustomUserPrincipal(userId, memberId),
                 null, // 이미 인증되었으므로 null
                 Arrays.stream(roles)
                         .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
