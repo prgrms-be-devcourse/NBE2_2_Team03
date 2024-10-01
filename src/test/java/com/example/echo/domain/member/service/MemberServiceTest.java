@@ -22,7 +22,7 @@ public class MemberServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Test
-    public void testSignup() {
+    public void testSignUp() {
         // 회원가입 로직 테스트
         Member member = new Member();
         member.setUserId("testuser");
@@ -33,7 +33,7 @@ public class MemberServiceTest {
         member.setPhone("010-1234-5678");
         member.setAvatarImage("default-avatar.jpg");
 
-        memberService.signup(member);
+        memberService.signUp(member);
 
         // 회원가입 후 저장된 사용자 정보 검증
         Member savedMember = memberRepository.findByUserId("testuser").get();

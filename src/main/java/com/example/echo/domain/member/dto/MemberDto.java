@@ -3,8 +3,6 @@ package com.example.echo.domain.member.dto;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
-
 
 
 @Getter
@@ -22,7 +20,7 @@ public class MemberDto {
     private String avatarImage;
     private Role role;
 
-    public static MemberDto of(Member member){
+    public static MemberDto of(Member member) {
         return MemberDto.builder()
                 .memberId(member.getMemberId())
                 .userId(member.getUserId()) // user뒤에 Name을 Id로 변경
@@ -35,7 +33,7 @@ public class MemberDto {
                 .build();
     }
 
-    public Member toEntity(){
+    public Member toEntity() {
         return Member.builder()
                 .memberId(this.memberId)
                 .userId(this.userId) // username에서 userId로 변경
