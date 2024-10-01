@@ -22,6 +22,13 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    // 로그인 API
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestParam String userId, @RequestParam String password) {
+        String token = memberService.login(userId, password);
+        return ResponseEntity.ok(token);
+    }
+
     //회원 등록
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<MemberResponse>> createMember(@Valid @RequestBody MemberCreateRequest memberRequest) {
@@ -56,6 +63,13 @@ public class MemberController {
     public ResponseEntity<ApiResponse<Void>> deleteMember(@PathVariable Long memberId) {
         memberService.deleteMember(memberId);
         return ResponseEntity.ok(ApiResponse.success(null));
+    }
+
+    // UserId로 찾기
+    @GetMapping("/{userId}")
+    public ResponseEntity<MemberDto> getMemberByUserId(@PathVariable String userId){
+        MemberDto memberDto = memberService.findByUserId(userId);
+        return ResponseEntity.ok(memberDto);
     }
 
     // 프로필 사진 조회

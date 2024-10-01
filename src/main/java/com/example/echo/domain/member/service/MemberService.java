@@ -9,19 +9,70 @@ import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
 import com.example.echo.global.exception.MemberNotFoundException;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import com.example.echo.global.config.JwtTokenProvider;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
+    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
-
     private final UploadUtil uploadUtil;
+
+
+    // 로그인 로직
+    public String login(String userId, String password) {
+        // 1. 사용자 정보 조회
+        Optional<Member> memberOpt = memberRepository.findByUserId(userId);
+        if (memberOpt.isEmpty()) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+
+        Member member = memberOpt.get();
+
+        // 2. 비밀번호 확인
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. JWT 토큰 생성
+        return JwtTokenProvider.createToken(member.getUserId(), member.getRole().name());
+    }
+
+    //로그인 패스워드 암호화하여 매칭시키기
+    public Member signup(Member member) {
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
+        return memberRepository.save(member);
+    }
+
+    //로그인할때 아이디로 찾는 로직
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        Optional<Member> memberOptional = memberRepository.findByUserId(userId);
+        if (memberOptional.isEmpty()) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+        Member member = memberOptional.get();
+
+        // UserDetails 반환 (username, password, 권한)
+        return User.builder()
+                .username(member.getUserId())
+                .password(member.getPassword())
+                .roles(member.getRole().name())
+                .build();
+    }
+
 
     // 회원 등록
     @Transactional
@@ -38,6 +89,7 @@ public class MemberService {
 
     //전체 회원 조회
     public List<MemberResponse> getAllMembers() {
+
         return memberRepository.findAll().stream()
                 .map(MemberResponse::from)
                 .collect(Collectors.toList());
@@ -56,6 +108,17 @@ public class MemberService {
     @Transactional
     public void deleteMember(Long memberId) {
         memberRepository.delete(findMemberById(memberId));
+    }
+
+    //UserId로 유저 찾기
+    public MemberDto findByUserId(String userId){
+        Optional<Member> memberOpt = memberRepository.findByUserId(userId);
+
+        if (memberOpt.isPresent()){
+            return MemberDto.of(memberOpt.get());
+        }else{
+            throw new RuntimeException("회원이 찾을 수 없습니다 : "+userId);
+        }
     }
 
     // 프로필 사진 조회

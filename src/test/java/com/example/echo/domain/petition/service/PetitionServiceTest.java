@@ -3,6 +3,7 @@ package com.example.echo.domain.petition.service;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import com.example.echo.domain.member.repository.MemberRepository;
+import com.example.echo.domain.petition.dto.request.PagingRequestDto;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
@@ -13,10 +14,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,16 +75,25 @@ class PetitionServiceTest {
 
     @Test
     @DisplayName("청원 전체 조회")
-    void getAllPetitions() {
+    void getPetitions() {
         // given
-        createPetition(testMember);
-        createPetition(testMember);
+        int totalPetitions = 25;
+        for (int i = 0; i < totalPetitions; i++) {
+            createPetition(testMember);
+        }
+
+        PagingRequestDto pagingRequestDto = new PagingRequestDto();
+        // 기본값을 사용: page=0, size=10, sortBy="agreeCount",'direction="desc"
 
         // when
-        List<PetitionResponseDto> petitions = petitionService.getAllPetitions();
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
 
         // then
-        assertThat(petitions).hasSize(2);
+        assertThat(petitionsPage.getContent()).hasSize(10);
+        assertThat(petitionsPage.getTotalElements()).isEqualTo(totalPetitions);
+        assertThat(petitionsPage.getTotalPages()).isEqualTo(3);
+        assertThat(petitionsPage.getNumber()).isEqualTo(0);
+        assertThat(petitionsPage.getSort().getOrderFor("agreeCount").getDirection()).isEqualTo(Sort.Direction.DESC);
     }
 
     @Test
@@ -184,6 +195,7 @@ class PetitionServiceTest {
                 .category(Category.POLITICS)
                 .originalUrl("http://test.com")
                 .relatedNews("테스트 관련 뉴스")
+                .agreeCount((int) (Math.random() * 1000))
                 .build();
         return petitionRepository.save(petition);
     }
