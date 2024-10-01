@@ -1,10 +1,12 @@
 package com.example.echo.domain.member.service;
 
-import com.example.echo.domain.member.dto.MemberDto;
+import com.example.echo.domain.member.dto.request.MemberCreateRequest;
+import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
+import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
-import com.example.echo.domain.member.dto.response.ProfileImageUpdateResponse;
+import com.example.echo.global.exception.MemberNotFoundException;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
@@ -74,48 +76,38 @@ public class MemberService implements UserDetailsService {
 
     // 회원 등록
     @Transactional
-    public MemberDto createMember(MemberDto memberDto) {
-        Member savedMember = memberRepository.save(memberDto.toEntity());
-        return MemberDto.of(savedMember);
+    public MemberResponse createMember(MemberCreateRequest memberRequest) {
+        Member member = memberRequest.toMember(); // DTO를 Member로 변환
+        Member savedMember = memberRepository.save(member);
+        return MemberResponse.from(savedMember);
     }
 
     //회원 조회
-    public MemberDto getMember(Long memberId) {  // Long memberId로 변경
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을수 없습니다."));
-        return MemberDto.of(member);
+    public MemberResponse getMember(Long memberId) {
+        return MemberResponse.from(findMemberById(memberId));
     }
 
     //전체 회원 조회
-    public List<MemberDto> getAllMembers() {
+    public List<MemberResponse> getAllMembers() {
+
         return memberRepository.findAll().stream()
-                .map(MemberDto::of)
+                .map(MemberResponse::from)
                 .collect(Collectors.toList());
     }
 
     //회원 정보 수정
     @Transactional
-    public MemberDto updateMember(Long memberId, MemberDto memberDto) { // Long memberId로 변경
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
-
-        member.setUserId(memberDto.getUserId()); // userId로 변경
-        member.setName(memberDto.getName());
-        member.setEmail(memberDto.getEmail());
-        member.setPhone(memberDto.getPhone());
-        member.setAvatarImage(memberDto.getAvatarImage());
-        member.setRole(memberDto.getRole());
-
-        return MemberDto.of(memberRepository.save(member));
+    public MemberResponse updateMember(Long memberId, MemberUpdateRequest memberRequest) {
+        Member member = findMemberById(memberId);
+        memberRequest.updateMember(member); // DTO로 Member 업데이트
+        return MemberResponse.from(memberRepository.save(member));
     }
 
 
     //id로 회원 삭제
     @Transactional
-    public void deleteMember(Long memberId) { // Long memberId로 변경
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
-        memberRepository.delete(member);
+    public void deleteMember(Long memberId) {
+        memberRepository.delete(findMemberById(memberId));
     }
 
     //UserId로 유저 찾기
@@ -131,27 +123,24 @@ public class MemberService implements UserDetailsService {
 
     // 프로필 사진 조회
     public String getAvatar(Long id) {
-        Member member = findMemberById(id);
-        return member.getAvatarImage(); // URL 반환
+        return findMemberById(id).getAvatarImage();
     }
 
     // 프로필 사진 업데이트
     @Transactional
-    public ProfileImageUpdateResponse updateAvatar(Long id, ProfileImageUpdateRequest requestDto) {
+    public MemberResponse updateAvatar(Long id, ProfileImageUpdateRequest requestDto) {
         Member member = findMemberById(id);
-
-        // 파일 업로드 후 경로 받기
         String avatarUrl = uploadUtil.upload(requestDto.getAvatarImage());
-        member.setAvatarImage(avatarUrl); // 경로 업데이트
+        member.setAvatarImage(avatarUrl);
+        memberRepository.save(member);
 
-        // 회원 정보를 저장하고 응답 DTO 생성
-        Member updatedMember = memberRepository.save(member);
-        return ProfileImageUpdateResponse.from(updatedMember);
+        return MemberResponse.from(member); // MemberResponse로 반환
     }
 
+
     // 공통 메서드: 회원 ID로 회원 조회
-    public Member findMemberById(Long memberId) {   // InquiryService에서도 회원 객체를 직접 접근해야 해서 public 변경
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+    private Member findMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("회원정보를 찾을 수 없습니다."));
     }
 }
