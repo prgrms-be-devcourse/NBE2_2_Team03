@@ -28,4 +28,14 @@ public enum Category {
     Category(String description) {
         this.description = description;
     }
+
+    public static Category fromDescription(String description) {
+        for (Category category : Category.values()) {
+            if (category.getDescription().equalsIgnoreCase(description.trim())) {
+                return category;
+            }
+        }
+        return null;
+    }
+
 }
