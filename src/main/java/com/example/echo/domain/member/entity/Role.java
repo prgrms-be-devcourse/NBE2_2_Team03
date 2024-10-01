@@ -1,6 +1,13 @@
 package com.example.echo.domain.member.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum Role {
-    ADMIN,
-    USER
+    ADMIN("관리자"),
+    USER("회원");
+
+    private final String description;
 }
