@@ -80,14 +80,14 @@ public class MemberService implements UserDetailsService {
     }
 
     //회원 조회
-    public MemberDto getMember(Long memberId){  // Long memberId로 변경
+    public MemberDto getMember(Long memberId) {  // Long memberId로 변경
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new RuntimeException("회원정보를 찾을수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("회원정보를 찾을수 없습니다."));
         return MemberDto.of(member);
     }
 
     //전체 회원 조회
-    public List<MemberDto> getAllMembers(){
+    public List<MemberDto> getAllMembers() {
         return memberRepository.findAll().stream()
                 .map(MemberDto::of)
                 .collect(Collectors.toList());
@@ -95,9 +95,9 @@ public class MemberService implements UserDetailsService {
 
     //회원 정보 수정
     @Transactional
-    public MemberDto updateMember(Long memberId, MemberDto memberDto){ // Long memberId로 변경
+    public MemberDto updateMember(Long memberId, MemberDto memberDto) { // Long memberId로 변경
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(()-> new RuntimeException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
 
         member.setUserId(memberDto.getUserId()); // userId로 변경
         member.setName(memberDto.getName());
@@ -112,9 +112,9 @@ public class MemberService implements UserDetailsService {
 
     //id로 회원 삭제
     @Transactional
-    public void deleteMember(Long memberId){ // Long memberId로 변경
+    public void deleteMember(Long memberId) { // Long memberId로 변경
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
         memberRepository.delete(member);
     }
 
@@ -150,8 +150,8 @@ public class MemberService implements UserDetailsService {
     }
 
     // 공통 메서드: 회원 ID로 회원 조회
-    private Member findMemberById(Long id) {
-        return memberRepository.findById(id)
+    public Member findMemberById(Long memberId) {   // InquiryService에서도 회원 객체를 직접 접근해야 해서 public 변경
+        return memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
     }
 }
