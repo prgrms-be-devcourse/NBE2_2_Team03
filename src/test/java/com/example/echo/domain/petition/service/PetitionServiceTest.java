@@ -5,6 +5,7 @@ import com.example.echo.domain.member.entity.Role;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.PagingRequestDto;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.request.SortBy;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
@@ -15,10 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -74,26 +75,57 @@ class PetitionServiceTest {
     }
 
     @Test
-    @DisplayName("청원 전체 조회")
-    void getPetitions() {
+    @DisplayName("청원 전체 조회 - 좋아요 순 정렬")
+    void getPetitions_SortByLikes() {
         // given
-        int totalPetitions = 25;
-        for (int i = 0; i < totalPetitions; i++) {
-            createPetition(testMember);
-        }
-
+        createMultiplePetitions(5);
         PagingRequestDto pagingRequestDto = new PagingRequestDto();
-        // 기본값을 사용: page=0, size=10, sortBy="agreeCount",'direction="desc"
+        pagingRequestDto.setSortBy(SortBy.LIKES_COUNT);
+        pagingRequestDto.setDirection("desc");
 
         // when
         Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
 
         // then
-        assertThat(petitionsPage.getContent()).hasSize(10);
-        assertThat(petitionsPage.getTotalElements()).isEqualTo(totalPetitions);
-        assertThat(petitionsPage.getTotalPages()).isEqualTo(3);
-        assertThat(petitionsPage.getNumber()).isEqualTo(0);
-        assertThat(petitionsPage.getSort().getOrderFor("agreeCount").getDirection()).isEqualTo(Sort.Direction.DESC);
+        List<PetitionResponseDto> petitions = petitionsPage.getContent();
+        assertThat(petitions).hasSize(5);
+        // p2의 좋아요 수가 p1보다 많으면 양수 반환, 이는 정렬 알고리즘에 의해 p2가 앞에 오도록 처리
+        assertThat(petitions).isSortedAccordingTo((p1, p2) -> p2.getLikesCount().compareTo(p1.getLikesCount()));
+    }
+
+    @Test
+    @DisplayName("청원 전체 조회 - 만료일 순 정렬")
+    void getPetitions_SortByExpirationDate() {
+        // given
+        createMultiplePetitions(5);
+        PagingRequestDto pagingRequestDto = new PagingRequestDto();
+        pagingRequestDto.setSortBy(SortBy.END_DATE);
+        pagingRequestDto.setDirection("desc");
+
+        // when
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
+
+        // then
+        List<PetitionResponseDto> petitions = petitionsPage.getContent();
+        assertThat(petitions).hasSize(5);
+        assertThat(petitions).isSortedAccordingTo((p1, p2) -> p2.getEndDate().compareTo(p1.getEndDate()));
+    }
+
+    @Test
+    @DisplayName("청원 전체 조회 - 카테고리별 정렬")
+    void getPetitions_FilterByCategory() {
+        // given
+        createMultiplePetitions(10);
+        PagingRequestDto pagingRequestDto = new PagingRequestDto();
+        pagingRequestDto.setCategory(Category.EDUCATION);
+
+        // when
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
+
+        // then
+        List<PetitionResponseDto> petitions = petitionsPage.getContent();
+        // petitions 컬렉션의 모든 요소(petition)의 카테고리가 EDUCATION 인지 확인
+        assertThat(petitions).allMatch(petition -> petition.getCategory() == Category.EDUCATION);
     }
 
     @Test
@@ -123,10 +155,8 @@ class PetitionServiceTest {
         assertThat(updatedPetition.getTitle()).isEqualTo("수정된 청원 제목");
         assertThat(updatedPetition.getContent()).isEqualTo("수정된 청원 내용");
         assertThat(updatedPetition.getSummary()).isEqualTo("수정된 청원 요약");
-        // 나노초 단위 무시, 초 단위까지만 테스트
         assertThat(updatedPetition.getStartDate()).isEqualToIgnoringNanos(newStartDate);
         assertThat(updatedPetition.getEndDate()).isEqualToIgnoringNanos(newEndDate);
-
         assertThat(updatedPetition.getCategory()).isEqualTo(Category.EDUCATION);
         assertThat(updatedPetition.getOriginalUrl()).isEqualTo("http://updated-test.com");
         assertThat(updatedPetition.getRelatedNews()).isEqualTo("수정된 관련 뉴스");
@@ -198,5 +228,27 @@ class PetitionServiceTest {
                 .agreeCount((int) (Math.random() * 1000))
                 .build();
         return petitionRepository.save(petition);
+    }
+
+    /**
+     * [페이징 테스트용 다수 청원 엔티티 생성]
+     * 정렬 테스트를 위해 각각 다른 값 부여
+     */
+    private void createMultiplePetitions(int count) {
+        for (int i = 0; i < count; i++) {
+            Petition petition = Petition.builder()
+                    .member(testMember)
+                    .title("테스트 청원 " + i)
+                    .content("테스트 청원 내용 " + i)
+                    .summary("테스트 청원 요약 " + i)
+                    .startDate(LocalDateTime.now().plusDays(i))
+                    .endDate(LocalDateTime.now().plusDays(30 + i))
+                    .category(i % 2 == 0 ? Category.POLITICS : Category.EDUCATION)
+                    .originalUrl("http://test" + i + ".com")
+                    .relatedNews("테스트 관련 뉴스 " + i)
+                    .agreeCount((int) (Math.random() * 1000))
+                    .build();
+            petitionRepository.save(petition);
+        }
     }
 }
