@@ -46,14 +46,14 @@ public class Petition {
     @Column(name = "original_url", nullable = false)
     private String originalUrl;
 
-    @Column(name = "related_news", nullable = false)
+    @Column(name = "related_news")
     private String relatedNews;
 
-    @Column(name = "likes_count", nullable = false)
+    @Column(name = "likes_count")
     @Builder.Default
     private Integer likesCount = 0;
 
-    @Column(name = "interest_count", nullable = false)
+    @Column(name = "interest_count")
     @Builder.Default
     private Integer interestCount = 0;
 

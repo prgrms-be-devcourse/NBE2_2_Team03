@@ -1,9 +1,12 @@
 package com.example.echo.domain.member.controller;
 
-import com.example.echo.domain.member.dto.MemberDto;
+import com.example.echo.domain.member.dto.request.MemberCreateRequest;
+import com.example.echo.domain.member.dto.request.MemberLoginRequest;
+import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
 import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
-import com.example.echo.domain.member.dto.response.ProfileImageUpdateResponse;
+import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.service.MemberService;
+import com.example.echo.global.api.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,78 +24,71 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    // 로그인
+    // 로그인 API
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody MemberDto memberDto) {
-        Map<String, String> token = memberService.login(memberDto);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<ApiResponse<Map<String, String>>> loginMember(@RequestBody MemberLoginRequest memberRequest) {
+        Map<String, String> token = memberService.login(memberRequest);
+        return ResponseEntity.ok(ApiResponse.success(token));
     }
 
     // 회원 등록
     @PostMapping("/signup")
-    public ResponseEntity<MemberDto> createMember(@Valid @RequestBody MemberDto memberDto) {
-        // 기본 아바타 이미지 경로 설정
-        memberDto.setAvatarImage("/images/avatar-default.png"); // static 폴더 내 이미지 경로
-        MemberDto createdMember = memberService.createMember(memberDto);
-        return ResponseEntity.ok(createdMember);
+    public ResponseEntity<ApiResponse<MemberResponse>> createMember(@Valid @RequestBody MemberCreateRequest memberRequest) {
+        MemberResponse createdMember = memberService.createMember(memberRequest);
+        return ResponseEntity.ok(ApiResponse.success(createdMember));
     }
 
     // 관리자 memberId로 회원 조회
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberDto> getMember(@PathVariable Long memberId) {
-        MemberDto memberDto = memberService.getMember(memberId);
-        return ResponseEntity.ok(memberDto);
+    public ResponseEntity<ApiResponse<MemberResponse>> getMember(@PathVariable Long memberId) {
+        MemberResponse memberDto = memberService.getMember(memberId);
+        return ResponseEntity.ok(ApiResponse.success(memberDto));
     }
 
     // 관리자 회원 전체 조회
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public ResponseEntity<List<MemberDto>> getAllMembers() {
-        List<MemberDto> members = memberService.getAllMembers();
-        return ResponseEntity.ok(members);
+    public ResponseEntity<ApiResponse<List<MemberResponse>>> getAllMembers() {
+        List<MemberResponse> members = memberService.getAllMembers();
+        return ResponseEntity.ok(ApiResponse.success(members));
     }
 
     // 회원 수정
-    @PreAuthorize("authentication.name == #memberDto.userId")   // 해당 userId만 접근 가능
-    @PutMapping("/{memberId}")  // memberId로 변경
-    public ResponseEntity<MemberDto> updateMember(
-            @PathVariable Long memberId,
-            @RequestBody MemberDto memberDto) {
-        MemberDto updatedMember = memberService.updateMember(memberId, memberDto);
-        return ResponseEntity.ok(updatedMember);
+    @PreAuthorize("authentication.principal.memberId == #memberId")   // 해당 userId만 접근 가능
+    @PutMapping("/{memberId}")
+    public ResponseEntity<ApiResponse<MemberResponse>> updateMember(@PathVariable Long memberId, @RequestBody MemberUpdateRequest memberRequest) {
+        MemberResponse updatedMember = memberService.updateMember(memberId, memberRequest);
+        return ResponseEntity.ok(ApiResponse.success(updatedMember));
     }
 
     // 관리자 회원 삭제
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{memberId}")   // memberId로 변경
-    public ResponseEntity<Void> deleteMember(@PathVariable Long memberId) {
+    @DeleteMapping("/{memberId}")
+    public ResponseEntity<ApiResponse<Void>> deleteMember(@PathVariable Long memberId) {
         memberService.deleteMember(memberId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 
     // 회원 프로필 사진 조회
-    @GetMapping("/{memberId}/avatar")
     @PreAuthorize("authentication.principal.memberId == #memberId")   // 해당 memberId만 접근 가능
-    public ResponseEntity<String> getAvatar(@PathVariable Long memberId) {
+    @GetMapping("/{memberId}/avatar")
+    public ResponseEntity<ApiResponse<String>> getAvatar(@PathVariable Long memberId) {
         String avatarUrl = memberService.getAvatar(memberId);
-        return ResponseEntity.ok(avatarUrl);
+        return ResponseEntity.ok(ApiResponse.success(avatarUrl));
     }
 
     // 회원 프로필 사진 업로드
-    @PostMapping("/{memberId}/avatar")
     @PreAuthorize("authentication.principal.memberId == #memberId")   // 해당 memberId만 접근 가능
-    public ResponseEntity<ProfileImageUpdateResponse> uploadAvatar(
+    @PostMapping("/{memberId}/avatar")
+    public ResponseEntity<ApiResponse<MemberResponse>> uploadAvatar(
             @PathVariable Long memberId,
             @RequestParam("avatarImage") MultipartFile avatarImage) {
-
-        // ProfileImageUpdateRequest 객체를 수동으로 생성
         ProfileImageUpdateRequest requestDto = new ProfileImageUpdateRequest();
-        requestDto.setAvatarImage(avatarImage); // MultipartFile을 요청 DTO에 설정
+        requestDto.setAvatarImage(avatarImage);
 
-        // 프로필 사진 업데이트
-        ProfileImageUpdateResponse responseDto = memberService.updateAvatar(memberId, requestDto);
-        return ResponseEntity.ok(responseDto);
+        MemberResponse responseDto = memberService.updateAvatar(memberId, requestDto);
+        return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
 }
 

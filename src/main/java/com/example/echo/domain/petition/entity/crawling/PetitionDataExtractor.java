@@ -42,18 +42,19 @@ public class PetitionDataExtractor {
     }
 
     public static String extractNumber(String text) {
-        String regex = "\\d{1,3}(,\\d{3})*";
-        Pattern pattern = Pattern.compile(regex);
+        String regex = "\\d{1,3}(,\\d{3})*"; // 데이터 찾기 위한 정규 표현식
+        Pattern pattern = Pattern.compile(regex);   // 정의한 정규 표현식 컴파일하여 패턴 객체 생성
         Matcher matcher = pattern.matcher(text);
 
-        if (matcher.find()) {
+        if (matcher.find()) { // 맞는 값 찾고 숫자 추출하기
             return matcher.group().replace(",", "");
         }
         return null;
     }
 
     public static Category convertCategory(String category) {
-        Category categoryEnum = Category.fromDescription(category);
+        Category categoryEnum = Category.fromDescription(category); // 해당하는 카테고리 enum 찾기
+
         if (categoryEnum == null) {
             System.out.println("Unknown category: " + category);
         }

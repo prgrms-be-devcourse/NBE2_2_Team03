@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-class InquiryRepositoryTest {
+class InquiryRepositoryTests {
 
     @Autowired
     private InquiryRepository inquiryRepository;
@@ -71,7 +71,7 @@ class InquiryRepositoryTest {
         assertEquals(1L, foundInquiry.get().getInquiryId());
         System.out.println(foundInquiry);
     }
-    
+
     @Test
     @DisplayName("ADMIN의 모든 1:1 문의 조회 페이징")
     void testFindAllInquiriesAdmin() throws Exception {
