@@ -23,7 +23,7 @@ public class MemberController {
     private final MemberService memberService;
 
     //회원 등록
-    @PostMapping
+    @PostMapping("/signup")
     public ResponseEntity<ApiResponse<MemberResponse>> createMember(@Valid @RequestBody MemberCreateRequest memberRequest) {
         MemberResponse createdMember = memberService.createMember(memberRequest);
         return ResponseEntity.ok(ApiResponse.success(createdMember));
