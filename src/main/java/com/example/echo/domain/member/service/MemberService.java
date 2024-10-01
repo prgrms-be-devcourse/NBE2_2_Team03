@@ -1,95 +1,146 @@
 package com.example.echo.domain.member.service;
 
-import com.example.echo.domain.member.dto.MemberDto;
+import com.example.echo.domain.member.dto.request.MemberCreateRequest;
+import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
+import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
-import com.example.echo.domain.member.dto.response.ProfileImageUpdateResponse;
+import com.example.echo.global.exception.MemberNotFoundException;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import com.example.echo.global.config.JwtTokenProvider;
 
 @Service
 @RequiredArgsConstructor
-public class MemberService {
+public class MemberService implements UserDetailsService {
 
+    private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
-
     private final UploadUtil uploadUtil;
+
+
+    // 로그인 로직
+    public String login(String userId, String password) {
+        // 1. 사용자 정보 조회
+        Optional<Member> memberOpt = memberRepository.findByUserId(userId);
+        if (memberOpt.isEmpty()) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+
+        Member member = memberOpt.get();
+
+        // 2. 비밀번호 확인
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. JWT 토큰 생성
+        return JwtTokenProvider.createToken(member.getUserId(), member.getRole().name());
+    }
+
+    //로그인 패스워드 암호화하여 매칭시키기
+    public Member signup(Member member) {
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
+        return memberRepository.save(member);
+    }
+
+    //로그인할때 아이디로 찾는 로직
+    @Override
+    public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        Optional<Member> memberOptional = memberRepository.findByUserId(userId);
+        if (memberOptional.isEmpty()) {
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+        Member member = memberOptional.get();
+
+        // UserDetails 반환 (username, password, 권한)
+        return User.builder()
+                .username(member.getUserId())
+                .password(member.getPassword())
+                .roles(member.getRole().name())
+                .build();
+    }
+
 
     // 회원 등록
     @Transactional
-    public MemberDto createMember(MemberDto memberDto) {
-        Member savedMember = memberRepository.save(memberDto.toEntity());
-        return MemberDto.of(savedMember);
+    public MemberResponse createMember(MemberCreateRequest memberRequest) {
+        Member member = memberRequest.toMember(); // DTO를 Member로 변환
+        Member savedMember = memberRepository.save(member);
+        return MemberResponse.from(savedMember);
     }
 
     //회원 조회
-    public MemberDto getMember(Long memberId){  // Long memberId로 변경
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new RuntimeException("회원정보를 찾을수 없습니다."));
-        return MemberDto.of(member);
+    public MemberResponse getMember(Long memberId) {
+        return MemberResponse.from(findMemberById(memberId));
     }
 
     //전체 회원 조회
-    public List<MemberDto> getAllMembers(){
+    public List<MemberResponse> getAllMembers() {
+
         return memberRepository.findAll().stream()
-                .map(MemberDto::of)
+                .map(MemberResponse::from)
                 .collect(Collectors.toList());
     }
 
     //회원 정보 수정
     @Transactional
-    public MemberDto updateMember(Long memberId, MemberDto memberDto){ // Long memberId로 변경
-        Member member = memberRepository.findById(memberId)
-            .orElseThrow(()-> new RuntimeException("회원정보를 찾을 수 없습니다."));
-
-        member.setUserId(memberDto.getUserId()); // userId로 변경
-        member.setName(memberDto.getName());
-        member.setEmail(memberDto.getEmail());
-        member.setPhone(memberDto.getPhone());
-        member.setAvatarImage(memberDto.getAvatarImage());
-        member.setRole(memberDto.getRole());
-
-        return MemberDto.of(memberRepository.save(member));
+    public MemberResponse updateMember(Long memberId, MemberUpdateRequest memberRequest) {
+        Member member = findMemberById(memberId);
+        memberRequest.updateMember(member); // DTO로 Member 업데이트
+        return MemberResponse.from(memberRepository.save(member));
     }
 
 
     //id로 회원 삭제
     @Transactional
-    public void deleteMember(Long memberId){ // Long memberId로 변경
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new RuntimeException("회원 정보를 찾을 수 없습니다."));
-        memberRepository.delete(member);
+    public void deleteMember(Long memberId) {
+        memberRepository.delete(findMemberById(memberId));
+    }
+
+    //UserId로 유저 찾기
+    public MemberDto findByUserId(String userId){
+        Optional<Member> memberOpt = memberRepository.findByUserId(userId);
+
+        if (memberOpt.isPresent()){
+            return MemberDto.of(memberOpt.get());
+        }else{
+            throw new RuntimeException("회원이 찾을 수 없습니다 : "+userId);
+        }
     }
 
     // 프로필 사진 조회
     public String getAvatar(Long id) {
-        Member member = findMemberById(id);
-        return member.getAvatarImage(); // URL 반환
+        return findMemberById(id).getAvatarImage();
     }
 
     // 프로필 사진 업데이트
     @Transactional
-    public ProfileImageUpdateResponse updateAvatar(Long id, ProfileImageUpdateRequest requestDto) {
+    public MemberResponse updateAvatar(Long id, ProfileImageUpdateRequest requestDto) {
         Member member = findMemberById(id);
-
-        // 파일 업로드 후 경로 받기
         String avatarUrl = uploadUtil.upload(requestDto.getAvatarImage());
-        member.setAvatarImage(avatarUrl); // 경로 업데이트
+        member.setAvatarImage(avatarUrl);
+        memberRepository.save(member);
 
-        // 회원 정보를 저장하고 응답 DTO 생성
-        Member updatedMember = memberRepository.save(member);
-        return ProfileImageUpdateResponse.from(updatedMember);
+        return MemberResponse.from(member); // MemberResponse로 반환
     }
+
 
     // 공통 메서드: 회원 ID로 회원 조회
     private Member findMemberById(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFoundException("회원정보를 찾을 수 없습니다."));
     }
 }

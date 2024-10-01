@@ -9,12 +9,10 @@ import com.example.echo.domain.petition.exception.MemberNotFoundException;
 import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,12 +40,8 @@ public class PetitionService {
     }
 
     // 청원 전체 조회
-    public List<PetitionResponseDto> getAllPetitions() {
-        return petitionRepository.findAll().stream()
-                // 각 Petition 객체에 대해 new PetitionResponseDto(petition)을 수행
-                .map(PetitionResponseDto::new)
-                // 변환된 PetitionResponseDto 객체들을 리스트로 모아서 반환
-                .collect(Collectors.toList());
+    public Page<PetitionResponseDto> getPetitions(Pageable pageable) {
+        return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
     }
 
     // 청원 수정
