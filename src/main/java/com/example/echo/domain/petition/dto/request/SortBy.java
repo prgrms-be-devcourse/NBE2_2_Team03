@@ -1,5 +1,8 @@
 package com.example.echo.domain.petition.dto.request;
 
+import lombok.Getter;
+
+@Getter
 public enum SortBy {
     AGREE_COUNT("agreeCount"),
     LIKES_COUNT("likesCount"),
@@ -10,9 +13,5 @@ public enum SortBy {
 
     SortBy(String field) {
         this.field = field;
-    }
-
-    public String getField() {
-        return this.field;
     }
 }
