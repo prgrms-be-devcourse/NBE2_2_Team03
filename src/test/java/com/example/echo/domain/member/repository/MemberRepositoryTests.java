@@ -31,7 +31,7 @@ public class MemberRepositoryTests {
                 .email("test@example.com")
                 .password("password123")
                 .phone("010-1234-5678")
-                .avatarImage("default.png")
+                .avatarImage("/images/avatar-default.png")
                 .role(Role.USER)
                 .build();
     }
@@ -62,5 +62,19 @@ public class MemberRepositoryTests {
 
         Optional<Member> foundMember = memberRepository.findById(savedMember.getMemberId());
         Assertions.assertFalse(foundMember.isPresent());
+    }
+
+    @Test
+    @Rollback
+    public void testUpdateAvatarImage() {
+        Member savedMember = memberRepository.save(testMember);
+
+        // 프로필 이미지 업데이트
+        savedMember.setAvatarImage("newAvatar.png");
+        memberRepository.save(savedMember);
+
+        Optional<Member> updatedMember = memberRepository.findById(savedMember.getMemberId());
+        Assertions.assertTrue(updatedMember.isPresent());
+        Assertions.assertEquals("newAvatar.png", updatedMember.get().getAvatarImage());
     }
 }
