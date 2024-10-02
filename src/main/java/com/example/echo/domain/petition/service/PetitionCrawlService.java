@@ -45,9 +45,7 @@ public class PetitionCrawlService {
     //title, href 이런 것들 따로 리스트에 저장한 뒤에
     //petition 다시 돌면서 href 같이 돌면서 들어가서 정보 가져오기
     public List<PetitionCrawl> dynamicCrawl(Long id, String url) {
-        // ChromeDriver 주소
-        System.setProperty("webdriver.chrome.driver", "C:/webprac/chromedriverwin32/chromedriver.exe");
-        // 옵셜 설정
+        // 옵션 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
 
