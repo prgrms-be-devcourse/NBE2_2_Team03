@@ -5,7 +5,7 @@ import com.example.echo.domain.inquiry.dto.request.InquiryRequestDTO;
 import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
 import com.example.echo.domain.inquiry.entity.Inquiry;
 import com.example.echo.domain.inquiry.repository.InquiryRepository;
-import com.example.echo.domain.member.dto.MemberDto;
+import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import com.example.echo.domain.member.service.MemberService;
@@ -24,7 +24,7 @@ public class InquiryService {
 
     @Transactional
     public InquiryResponseDTO createInquiry(InquiryRequestDTO inquiryRequestDTO) {
-        Member foundMember = memberService.findMemberById(inquiryRequestDTO.getMemberId());    // memberId로 Member 엔티티를 조회
+        Member foundMember = memberService.findMemberById(inquiryRequestDTO.getMemberId());
         Inquiry createdInquiry = inquiryRequestDTO.toEntity(foundMember);   // 1:1 문의 생성
         Inquiry savedInquiry = inquiryRepository.save(createdInquiry);
         return InquiryResponseDTO.from(savedInquiry);
@@ -39,7 +39,7 @@ public class InquiryService {
     // ADMIN/USER 회원 종류에 따른 1:1 문의 전체 리스트 조회
     public Page<InquiryResponseDTO> getInquiriesByMemberRole(Long memberId, InquiryPageRequestDTO inquiryPageRequestDTO) {
         // memberId에 따라 해당 다르게 조회
-        MemberDto foundMember = memberService.getMember(memberId);
+        MemberResponse foundMember = memberService.getMember(memberId);
         if (foundMember.getRole() == Role.ADMIN) {
             return findAllForAdmin(inquiryPageRequestDTO.getPageable());    // ADMIN 모든 문의 조회
         } else {
