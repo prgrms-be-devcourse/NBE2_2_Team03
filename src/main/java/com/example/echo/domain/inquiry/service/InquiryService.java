@@ -84,10 +84,11 @@ public class InquiryService {
     public void addAnswer(Long inquiryId, String replyContent){
         Inquiry inquiry = findInquiryById(inquiryId);
 
-        inquiry.setReplyContent(replyContent);
+        inquiry.changeReplyContent(replyContent);
         inquiryRepository.save(inquiry);
     }
 
+    // 문의ID와 멤버ID가 일치한지 확인
     public boolean isInquiryOwer(Long inquiryId, Long memberId){
         Inquiry inquiry = findInquiryById(inquiryId);
 
