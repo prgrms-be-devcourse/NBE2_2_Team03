@@ -87,4 +87,10 @@ public class InquiryService {
         inquiry.setReplyContent(replyContent);
         inquiryRepository.save(inquiry);
     }
+
+    public boolean isInquiryOwer(Long inquiryId, Long memberId){
+        Inquiry inquiry = findInquiryById(inquiryId);
+
+        return inquiry.getMember().getMemberId().equals(memberId);
+    }
 }
