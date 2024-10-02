@@ -2,6 +2,8 @@ package com.example.echo.domain.member.controller;
 
 import com.example.echo.global.exception.UploadException;
 import com.example.echo.global.util.UploadUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -15,10 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 @RequestMapping("/api/v1/files")
+@Tag(name = "File Controller", description = "파일 업로드 및 삭제 관리  API")
 public class FileController {
 
     private final UploadUtil uploadUtil;
 
+    // 파일 업로드
+    @Operation(summary = "파일 업로드", description = "파일을 업로드합니다.")
     @PostMapping("/upload")
     public ResponseEntity<List<String>> uploadFile(
             @RequestParam("files") MultipartFile[] files) {
@@ -56,6 +61,8 @@ public class FileController {
         }
     }
 
+    // 파일 삭제
+    @Operation(summary = "파일 삭제", description = "파일 이름으로 파일을 삭제합니다.")
     @DeleteMapping("/{filename}")
     public ResponseEntity<?> fileDelete(@PathVariable String filename) {
         log.info("--- fileDelete() invoked for filename: " + filename);
