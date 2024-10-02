@@ -3,6 +3,7 @@ package com.example.echo.domain.petition.controller;
 import com.example.echo.domain.petition.entity.crawling.PetitionCrawl;
 import com.example.echo.domain.petition.service.PetitionCrawlService;
 import com.example.echo.global.api.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class PetitionCrawlController {
     private final PetitionCrawlService petitionCrawlService;
 
     //상세페이지 이동 가능한 리스트 크롤링
+    @Operation(summary = "상세페이지 이동 가능한 리스트 크롤링", description = "청원 상세페이지로 이동할 수 있는 리스트를 크롤링합니다.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/petitioncrawl/{id}") // 관리자 정보 들어가게 하기 위해 로그인 처리?
     public ResponseEntity<ApiResponse<List<PetitionCrawl>>> crawlDesPage(@PathVariable Long id) { //url 입력
