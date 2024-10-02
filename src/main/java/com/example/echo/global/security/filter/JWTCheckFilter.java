@@ -29,7 +29,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     // 필터링 적용하지 않을 URI 체크
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return isAuthExcludedPath(request.getRequestURI()); // 토큰 발급 경로는 제외
+        return isAuthExcludedPath(request); // 토큰 발급 경로는 제외
     }
 
     // 필터링 적용 - 액세스 토큰 확인
@@ -57,8 +57,21 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     }
 
     // 특정 URI가 인증 제외 경로인지 확인
-    private boolean isAuthExcludedPath(String requestURI) {
-        return requestURI.startsWith("/api/members/login") || requestURI.startsWith("/api/members/signup");
+    private boolean isAuthExcludedPath(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        String method = request.getMethod();
+
+        // 회원 가입/로그인 경로 인증 제외
+        if (requestURI.startsWith("/api/members/login") || requestURI.startsWith("/api/members/signup")) {
+            return true;
+        }
+
+        // 청원 단건/전체/만료일순 조회(GET)는 인증 제외
+        if (requestURI.startsWith("/api/petitions") && "GET".equalsIgnoreCase(method)) {
+            return true;
+        }
+
+        return false;
     }
 
     // 액세스 토큰 유효성 검사
