@@ -4,6 +4,7 @@ import com.example.echo.domain.petition.dto.request.PagingRequestDto;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.service.PetitionService;
+import com.example.echo.domain.petition.service.SummarizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class PetitionController {
 
     private final PetitionService petitionService;
+    private final SummarizationService summarizationService;
 
     // 청원 등록
     @Operation(summary = "청원 등록", description = "새로운 청원을 등록합니다.")
@@ -29,11 +31,13 @@ public class PetitionController {
     }
 
     // 청원 단건 조회
+    // 요약이 있는 경우 바로 반환
+    // 요약이 없는 경우 api 호출 후 요약 값 저장 후 반환
     @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
     @GetMapping("/{petitionId}")
     public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long petitionId) {
-        PetitionResponseDto petition = petitionService.getPetitionById(petitionId);
-        return ResponseEntity.ok(petition);
+        PetitionResponseDto petitionResponseDto = petitionService.getPetitionById(petitionId);
+        return ResponseEntity.ok(petitionResponseDto);
     }
 
     // 청원 전체 조회
