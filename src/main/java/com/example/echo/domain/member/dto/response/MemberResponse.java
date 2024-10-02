@@ -5,6 +5,8 @@ import com.example.echo.domain.member.entity.Role;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Map;
+
 @Getter
 @Builder
 public class MemberResponse {
@@ -15,6 +17,8 @@ public class MemberResponse {
     private String phone;
     private String avatarImage;
     private Role role;
+    private String accessToken;
+    private String refreshToken;
 
     public static MemberResponse from(Member member) {
         return MemberResponse.builder()
@@ -25,6 +29,13 @@ public class MemberResponse {
                 .phone(member.getPhone())
                 .avatarImage(member.getAvatarImage())
                 .role(member.getRole())
+                .build();
+    }
+
+    public static MemberResponse from(Map<String, String> token) {
+        return MemberResponse.builder()
+                .accessToken(token.get("accessToken"))
+                .refreshToken(token.get("refreshToken"))
                 .build();
     }
 }

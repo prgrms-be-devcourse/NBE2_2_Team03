@@ -9,7 +9,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name = "member")
@@ -79,5 +81,16 @@ public class Member {
                 ", interestListSize=" + interestList.size() +
                 ", inquiryListSize=" + inquiryList.size() +
                 '}';
+    }
+
+    // JWT 문자의 내용 반환
+    public Map<String, Object> getPayload() {
+        Map<String, Object> payloadMap = new HashMap<>();
+        payloadMap.put("memberId", memberId);
+        payloadMap.put("userId", userId);
+        payloadMap.put("name", name);
+        payloadMap.put("email", email);
+        payloadMap.put("role", role);
+        return payloadMap;
     }
 }

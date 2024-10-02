@@ -16,7 +16,7 @@ import org.springframework.data.domain.Page;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-class InquiryServiceTest {
+class InquiryServiceTests {
 
     @Autowired
     private InquiryService inquiryService;

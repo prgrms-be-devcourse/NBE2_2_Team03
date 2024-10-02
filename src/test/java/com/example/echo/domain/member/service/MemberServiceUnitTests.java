@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
@@ -29,6 +30,9 @@ class MemberServiceUnitTests {
 
     @Mock
     private UploadUtil uploadUtil; // UploadUtil 모의 객체
+
+    @Mock
+    private PasswordEncoder passwordEncoder; // PasswordEncoder 모의 객체
 
     @InjectMocks
     private MemberService memberService; // 테스트 할 MemberService 객체
