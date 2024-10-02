@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -43,7 +44,7 @@ public class PetitionCrawlService {
 
     //title, href 이런 것들 따로 리스트에 저장한 뒤에
     //petition 다시 돌면서 href 같이 돌면서 들어가서 정보 가져오기
-    public String dynamicCrawl(Long id, String url) {
+    public List<PetitionCrawl> dynamicCrawl(Long id, String url) {
         // ChromeDriver 주소
         System.setProperty("webdriver.chrome.driver", "C:/webprac/chromedriverwin32/chromedriver.exe");
         // 옵셜 설정
@@ -58,7 +59,7 @@ public class PetitionCrawlService {
         try {
             driver.get(url);
 
-            int waitDuration = 20;
+            int waitDuration = 30;
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(waitDuration));
 
             // 마지막 페이지 무한 출력 해결을 위한 이전 제목들 저장
@@ -66,10 +67,15 @@ public class PetitionCrawlService {
 
             while (true) {
                 wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".list_card")));
+                wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".item_card")));
                 List<WebElement> petitionCards = driver.findElements(By.cssSelector(".item_card"));
                 for (WebElement petitionCard : petitionCards) {
                     System.out.println(petitionCard.getText());
                 }
+                // 이전 페이지의 제목 목록과 비교하는 작업 필요
+                // 새로운 페이지의 제목 목록
+                // 비교해서 다르면 대기
+                // 페이지 끝나면 새로운 페이지 목록을 이전 페이지 목록으로 설정
 
                 int countPetition = 0;
                 // petition 크롤링
@@ -116,10 +122,6 @@ public class PetitionCrawlService {
                 int totalPagesNum = Integer.parseInt(pageNumbers[1].trim());
                 System.out.println("Current Page: " + currentPageNum);
                 System.out.println("Total Pages: " + totalPagesNum);
-
-                for (PetitionCrawl petitionCrawl : crawledData) {
-                    System.out.println(petitionCrawl.getTitle());
-                }
 
                 // 페이지 비교 통과면 다음 페이지로 넘기기
                 if (!navigateToNextPage(driver, wait, currentPageNum, totalPagesNum, petitionCards)) {
@@ -184,7 +186,7 @@ public class PetitionCrawlService {
         }
         // 크롤링 완료
 
-        return crawledData.toString(); //result.toString();
+        return crawledData; //result.toString();
     }
 
     private boolean navigateToNextPage(WebDriver driver, WebDriverWait wait, int currentPageNum, int totalPagesNum,
@@ -193,16 +195,49 @@ public class PetitionCrawlService {
             if (currentPageNum == totalPagesNum) {
                 return false;
             }
+            Thread.sleep(100);
+            List<String> oldTitles = petitionCards.stream()
+                    .map(card -> card.findElement(By.cssSelector(".desc")).getText())
+                    .collect(Collectors.toList());
+            for (String title : oldTitles) {
+                System.out.println(title);
+            }
 
             WebElement nextButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.btn.next-button")));
             nextButton.click();
+
+            Thread.sleep(100);
+            wait.until(webDriver -> ((JavascriptExecutor) webDriver)
+                    .executeScript("return document.readyState").equals("complete"));
+
+            Thread.sleep(100);
             List<WebElement> newPetitionCards = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".item_card")));
-            while (petitionCards.get(0) == newPetitionCards.get(0)) {
-                wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".item_card")));
+
+            Thread.sleep(100);
+            try {
+                newPetitionCards.stream()
+                        .map(card -> card.findElement(By.cssSelector(".desc")).getText())
+                        .collect(Collectors.toList());
+            } catch (StaleElementReferenceException e) {
+                System.out.println("new page desc found err");
+            }
+            List<String> newTitles = newPetitionCards.stream()
+                    .map(card -> card.findElement(By.cssSelector(".desc")).getText())
+                    .collect(Collectors.toList());
+
+            for (String title : newTitles) {
+                System.out.println(title);
+            }
+
+
+            while (oldTitles.equals(newTitles)) {
+                newPetitionCards = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".item_card")));
+                newTitles = newPetitionCards.stream()
+                        .map(card -> card.findElement(By.cssSelector(".desc")).getText())
+                        .collect(Collectors.toList());
             }
             return true;
-//            // 페이지 stale 이용 시 err 발생 대신 새로운 list 먼저 생성 후 첫번째 값 비교
-//
+
         } catch (StaleElementReferenceException e) {
             logger.error("StaleElementReferenceException while paging: ", e);
             System.out.println("Stale element on pagination, retrying...");
@@ -211,6 +246,8 @@ public class PetitionCrawlService {
             logger.error("TimeoutException | NoSuchElementException while paging : ", e);
             System.out.println("No more pages or next button not found.");
             return false;
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -230,4 +267,3 @@ public class PetitionCrawlService {
     }
 
 }
-
