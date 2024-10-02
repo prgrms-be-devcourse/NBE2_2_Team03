@@ -67,35 +67,14 @@ public class PetitionCrawlService {
             while (true) {
                 wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".list_card")));
                 List<WebElement> petitionCards = driver.findElements(By.cssSelector(".item_card"));
-
-                //////////
-                // 마지막 페이지 무한 출력 해결을 위한 현재 페이지 제목들 저장
-                List<String> currentTitles = new ArrayList<>();
-                for (WebElement petition : petitionCards) {
-                    try {
-                        String title = petition.findElement(By.cssSelector(".desc")).getText();
-                        currentTitles.add(title);
-                    } catch (StaleElementReferenceException e) {
-                        System.out.println("Stale element. Retrying...");
-                        break;
-                    }
+                for (WebElement petitionCard : petitionCards) {
+                    System.out.println(petitionCard.getText());
                 }
-
-                // 제목 값들 비교
-                if (currentTitles.equals(previousTitles) ) {
-                    System.out.println("No more new content to load. Ending crawl.");
-                    System.out.println(currentTitles);
-                    System.out.println(previousTitles);
-                    break;
-                }
-
-                //  if 문 안걸렸으면 다음 페이지로 이동 후 비교를 위해 현재 제목들 이전 제목으로 설정
-                previousTitles = new ArrayList<>(currentTitles);
-                //////////
 
                 int countPetition = 0;
                 // petition 크롤링
-                for (WebElement petition : petitionCards) {
+                for (WebElement petition : petitionCards) {  // 여기 두 번 반복되어 들어가 있음
+                    // 아래 crawledData checkNum 3이어야하는데 6
                     try {
                         // petition 하나마다 값 가져오고 href 로 넘어가서 내용 받아오기
 
@@ -118,6 +97,8 @@ public class PetitionCrawlService {
 
                         result.append(title).append(" ").append(category).append(" ").append(href).append("\n");
                         countPetition++;
+                        System.out.println(countPetition);
+
 
                     } catch (Exception e) {
                         System.out.println(countPetition);
@@ -126,30 +107,38 @@ public class PetitionCrawlService {
 
                 }
 
-                //////////////
-                // 페이지 핸들링
-                if (!navigateToNextPage(driver, wait)) {
+                // 현재 페이지와 마지막 페이지 비교 같으면 종료
+                WebElement pagingElement = driver.findElement(By.cssSelector("div.mobile_paging span"));
+                String currentPage = pagingElement.findElement(By.tagName("em")).getText();
+                String fullText = pagingElement.getText();
+                String[] pageNumbers = fullText.split("/");
+                int currentPageNum = Integer.parseInt(pageNumbers[0].trim()); // "7"
+                int totalPagesNum = Integer.parseInt(pageNumbers[1].trim());
+                System.out.println("Current Page: " + currentPageNum);
+                System.out.println("Total Pages: " + totalPagesNum);
+
+                for (PetitionCrawl petitionCrawl : crawledData) {
+                    System.out.println(petitionCrawl.getTitle());
+                }
+
+                // 페이지 비교 통과면 다음 페이지로 넘기기
+                if (!navigateToNextPage(driver, wait, currentPageNum, totalPagesNum, petitionCards)) {
                     break;
                 }
+
             }
+//
+            int checkNum = 0;
 
             for (PetitionCrawl eachData : crawledData) {
-//                System.out.println("Title: " + eachData.getTitle() + "\n"
-//                        + "Period: " + eachData.getPeriod() + "\n"
-//                        + "Category: " + eachData.getCategory() + "\n"
-//                        + "AgreeCount: " + eachData.getAgreeCount() + "\n"
-//                        + "Original Url Href: " + eachData.getHref());
-                fetchPetitionDetails(driver, wait, eachData);
-//                //content 추가 확인
-//                // System.out.println(eachData.getTitle() + "\n" + eachData.getContent());
-//                System.out.println("Title: " + eachData.getTitle() + "\n"
-//                        + "Period: " + eachData.getPeriod() + "\n"
-//                        + "Category: " + eachData.getCategory() + "\n"
-//                        + "AgreeCount: " + eachData.getAgreeCount() + "\n"
-//                        + "Original Url Href: " + eachData.getHref() + "\n"
-//                        + "Content" + eachData.getContent());
-//                result.append(eachData.getTitle()).append("\n").append(eachData.getContent());
-//////////////////
+                checkNum++;
+                try {
+                    fetchPetitionDetails(driver, wait, eachData);
+                } catch (StaleElementReferenceException e) {
+                    log.error("Stale element reference. Retrying petition details fetching for {}", eachData.getHref());
+                    fetchPetitionDetails(driver, wait, eachData);
+                }
+
                 String title = eachData.getTitle();
                 log.info("Processing petition: Title={}, Period={}, Category={}", eachData.getTitle(), eachData.getPeriod(), eachData.getCategory());
                 // 기간으로 설정 된 값에서 시작일, 종료일 뽑아내기
@@ -183,8 +172,10 @@ public class PetitionCrawlService {
                 petitionRepository.save( petitionSave );
 
                 System.out.println("Saved Petition: " + petitionSave.getTitle());
-/////////////////////////////
+///////////////////////////
             }
+
+            System.out.println(checkNum);
         } catch (Exception e) {
             logger.error("An error occurred: ", e);
             //return null;
@@ -196,29 +187,28 @@ public class PetitionCrawlService {
         return crawledData.toString(); //result.toString();
     }
 
-    private boolean isLastButtonPresent(WebDriver driver, WebDriverWait wait) {
+    private boolean navigateToNextPage(WebDriver driver, WebDriverWait wait, int currentPageNum, int totalPagesNum,
+                                       List<WebElement> petitionCards) {
         try {
-            WebElement lastButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("button.btn.last-button")));
-            return lastButton.isDisplayed(); // last button 있으면 마지막 페이지 아님
-        } catch (NoSuchElementException | TimeoutException e) {
-            System.out.println("Last button not found.");
-            return false; // 없으면 마지막 페이지.
-        }
-    }
-
-    private boolean navigateToNextPage(WebDriver driver, WebDriverWait wait) {
-        try {
-            WebElement nextButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.btn.next-button")));
-            if (!nextButton.isEnabled()) {
-                return false; // No more pages to load
+            if (currentPageNum == totalPagesNum) {
+                return false;
             }
+
+            WebElement nextButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("button.btn.next-button")));
             nextButton.click();
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".list_card")));
+            List<WebElement> newPetitionCards = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".item_card")));
+            while (petitionCards.get(0) == newPetitionCards.get(0)) {
+                wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".item_card")));
+            }
             return true;
+//            // 페이지 stale 이용 시 err 발생 대신 새로운 list 먼저 생성 후 첫번째 값 비교
+//
         } catch (StaleElementReferenceException e) {
+            logger.error("StaleElementReferenceException while paging: ", e);
             System.out.println("Stale element on pagination, retrying...");
             return false;
         } catch (TimeoutException | NoSuchElementException e) {
+            logger.error("TimeoutException | NoSuchElementException while paging : ", e);
             System.out.println("No more pages or next button not found.");
             return false;
         }
@@ -226,14 +216,18 @@ public class PetitionCrawlService {
 
     private void fetchPetitionDetails(WebDriver driver, WebDriverWait wait, PetitionCrawl petitionCrawl) {
         try {
-            driver.get(petitionCrawl.getHref());
-            wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
-            WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".pre.contentTxt")));
-            String content = contentElement.getText();
-            petitionCrawl.changeContent(content);
+            while (petitionCrawl.getContent() == null) {
+                driver.get(petitionCrawl.getHref());
+                wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+                WebElement contentElement = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".pre.contentTxt")));
+                wait.until(webDriver -> !contentElement.getText().trim().isEmpty());
+                String content = contentElement.getText();
+                petitionCrawl.changeContent(content);
+            }
         } catch (TimeoutException | NoSuchElementException e) {
-            System.out.println("Could not retrieve petition details: " + e.getMessage());
+            logger.error("TimeoutException | NoSuchElementException while fetching: ", e);
         }
     }
 
 }
+
