@@ -2,10 +2,7 @@ package com.example.echo.domain.inquiry.entity;
 
 import com.example.echo.domain.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "inquiry")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
