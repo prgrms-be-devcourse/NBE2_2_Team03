@@ -6,6 +6,7 @@ import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.service.PetitionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,23 @@ public class PetitionController {
         Page<PetitionResponseDto> petitions = petitionService.getPetitions(pagingRequestDto.toPageable(),pagingRequestDto.getCategory());
         return ResponseEntity.ok(petitions);
     }
+
+    // 청원 만료일 순 5개 조회
+    @Operation(summary = "청원 만료일 기준 조회", description = "만료일이 가까운 청원 5개를 조회합니다.")
+    @GetMapping("/view/endDate")
+    public ResponseEntity<List<PetitionResponseDto>> getEndDatePetitions() {
+        List<PetitionResponseDto> endDatePetitions = petitionService.getEndDatePetitions();
+        return ResponseEntity.ok(endDatePetitions);
+    }
+
+    // 청원 동의자 순 5개 조회
+    @Operation(summary = "청원 동의자 수 기준 조회", description = "동의자 수 많은 청원 5개를 조회합니다.")
+    @GetMapping("/view/agreeCount")
+    public ResponseEntity<List<PetitionResponseDto>> getAgreeCountPetitions() {
+        List<PetitionResponseDto> agreeCountPetitions = petitionService.getAgreeCountPetitions();
+        return ResponseEntity.ok(agreeCountPetitions);
+    }
+
 
     // 청원 수정
     @PreAuthorize("hasRole('ADMIN')")

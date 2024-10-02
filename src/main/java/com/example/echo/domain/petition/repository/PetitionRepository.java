@@ -1,7 +1,9 @@
 package com.example.echo.domain.petition.repository;
 
 import com.example.echo.domain.petition.entity.Category;
+import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Petition;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -15,4 +17,10 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
 
     @Query("SELECT p FROM Petition p WHERE p.originalUrl = :originalUrl")
     Optional<Petition> findByUrl(@Param("originalUrl") String originUrl);
+
+    @Query("SELECT p FROM Petition p ORDER BY p.endDate ASC")
+    List<PetitionResponseDto> getEndDatePetitions(Pageable pageable);
+
+    @Query("SELECT p FROM Petition p ORDER BY p.agreeCount DESC")
+    List<PetitionResponseDto> getAgreeCountPetitions(Pageable pageable);
 }

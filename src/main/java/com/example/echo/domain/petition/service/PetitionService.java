@@ -9,8 +9,10 @@ import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.exception.MemberNotFoundException;
 import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +51,18 @@ public class PetitionService {
         }
     }
 
+    // 청원 만료일 순 5개 조회
+    public List<PetitionResponseDto> getEndDatePetitions() {
+        Pageable pageable = PageRequest.of(0, 5);
+        return petitionRepository.getEndDatePetitions(pageable);
+    }
+
+    // 청원 동의자 순 5개 조회
+    public List<PetitionResponseDto> getAgreeCountPetitions() {
+        Pageable pageable = PageRequest.of(0, 5);
+        return petitionRepository.getAgreeCountPetitions(pageable);
+    }
+
     // 청원 수정
     @Transactional
     public PetitionResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
@@ -70,4 +84,5 @@ public class PetitionService {
         }
         petitionRepository.deleteById(petitionId);
     }
+
 }
