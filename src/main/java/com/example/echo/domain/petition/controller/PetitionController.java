@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,28 +24,27 @@ public class PetitionController {
     private final SummarizationService summarizationService;
 
     // 청원 등록
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 등록", description = "새로운 청원을 등록합니다.")
     @PostMapping
-    public ResponseEntity<PetitionResponseDto> createPetition(@RequestBody PetitionRequestDto petitionDto) {
-        PetitionResponseDto createdPetition = petitionService.createPetition(petitionDto);
+    public ResponseEntity<PetitionDetailResponseDto> createPetition(@RequestBody PetitionRequestDto petitionDto) {
+        PetitionDetailResponseDto createdPetition = petitionService.createPetition(petitionDto);
         return ResponseEntity.ok(createdPetition);
     }
 
     // 청원 단건 조회
-    // 요약이 있는 경우 바로 반환
-    // 요약이 없는 경우 api 호출 후 요약 값 저장 후 반환
     @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
     @GetMapping("/{petitionId}")
-    public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long petitionId) {
-        PetitionResponseDto petitionResponseDto = petitionService.getPetitionById(petitionId);
-        return ResponseEntity.ok(petitionResponseDto);
+    public ResponseEntity<PetitionDetailResponseDto> getPetitionById(@PathVariable Long petitionId) {
+        PetitionDetailResponseDto petition = petitionService.getPetitionById(petitionId);
+        return ResponseEntity.ok(petition);
     }
 
     // 청원 전체 조회
-    @Operation(summary = "청원 전체 조회", description = "모든 청원을 조회합니다.")
+    @Operation(summary = "청원 전체 조회", description = "모든 청원을 페이지별로 조회합니다.")
     @GetMapping
-    public ResponseEntity<Page<PetitionResponseDto>> getPetitions(PagingRequestDto pagingRequestDto) {
-        Page<PetitionResponseDto> petitions = petitionService.getPetitions(pagingRequestDto.toPageable());
+    public ResponseEntity<Page<PetitionResponseDto>> getPetitions(Pageable pageable) {
+        Page<PetitionResponseDto> petitions = petitionService.getPetitions(pageable);
         return ResponseEntity.ok(petitions);
     }
 
@@ -64,16 +64,26 @@ public class PetitionController {
         return ResponseEntity.ok(agreeCountPetitions);
     }
 
+    // 청원 카테고리 선택 5개 조회
+    @Operation(summary = "청원 카테고리별 조회", description = "특정 카테고리의 청원 5개를 랜덤 순으로 조회합니다.")
+    @GetMapping("/view/category/{category}")
+    public ResponseEntity<List<PetitionResponseDto>> getRandomCategoryPetitions(@PathVariable Category category) {
+        List<PetitionResponseDto> categoryPetitions = petitionService.getRandomCategoryPetitions(category);
+        return ResponseEntity.ok(categoryPetitions);
+    }
+
 
     // 청원 수정
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 수정", description = "특정 ID의 청원을 수정합니다.")
     @PutMapping("/{petitionId}")
-    public ResponseEntity<PetitionResponseDto> updatePetition(@PathVariable Long petitionId, @RequestBody PetitionRequestDto petitionDto) {
-        PetitionResponseDto updatedPetition = petitionService.updatePetition(petitionId, petitionDto);
+    public ResponseEntity<PetitionDetailResponseDto> updatePetition(@PathVariable Long petitionId, @RequestBody PetitionRequestDto petitionDto) {
+        PetitionDetailResponseDto updatedPetition = petitionService.updatePetition(petitionId, petitionDto);
         return ResponseEntity.ok(updatedPetition);
     }
 
     // 청원 삭제
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 삭제", description = "특정 ID의 청원을 삭제합니다.")
     @DeleteMapping("/{petitionId}")
     public ResponseEntity<Void> deletePetitionById(@PathVariable Long petitionId) {
