@@ -2,6 +2,7 @@ package com.example.echo.domain.inquiry.service;
 
 import com.example.echo.domain.inquiry.dto.request.InquiryPageRequestDTO;
 import com.example.echo.domain.inquiry.dto.request.InquiryRequestDTO;
+import com.example.echo.domain.inquiry.dto.request.InquiryUpdateRequestDTO;
 import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
 import com.example.echo.domain.inquiry.entity.Inquiry;
 import com.example.echo.domain.inquiry.repository.InquiryRepository;
@@ -61,5 +62,29 @@ public class InquiryService {
     // USER 본인 문의 조회
     private Page<InquiryResponseDTO> findAllForUser(Long memberId, Pageable pageable) {
         return inquiryRepository.findAllInquiriesUser(memberId, pageable);
+    }
+
+    //본인 1:1문의 수정
+    @Transactional
+    public InquiryResponseDTO updateInquiry (Long inquiryId, InquiryUpdateRequestDTO inquiryUpdateRequestDTO){
+        Inquiry inquiry = findInquiryById(inquiryId);
+        inquiryUpdateRequestDTO.updateInquiry(inquiry);
+
+        return InquiryResponseDTO.from(inquiryRepository.save(inquiry));
+    }
+
+    //1:1 문의 삭제
+    @Transactional
+    public void deleteInquiry(Long inquiryId){
+        inquiryRepository.delete(findInquiryById(inquiryId));
+    }
+
+    //관리자 답변
+    @Transactional
+    public void addAnswer(Long inquiryId, String replyContent){
+        Inquiry inquiry = findInquiryById(inquiryId);
+
+        inquiry.setReplyContent(replyContent);
+        inquiryRepository.save(inquiry);
     }
 }
