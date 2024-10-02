@@ -1,5 +1,6 @@
 package com.example.echo.domain.member.controller;
 
+import com.example.echo.domain.member.dto.MemberDto;
 import com.example.echo.domain.member.dto.request.MemberCreateRequest;
 import com.example.echo.domain.member.dto.request.MemberLoginRequest;
 import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
