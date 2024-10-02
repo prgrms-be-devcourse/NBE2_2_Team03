@@ -52,6 +52,13 @@ public class PetitionController {
         return ResponseEntity.ok(endDatePetitions);
     }
 
+    // 청원 동의자 순 5개 조회
+    @Operation(summary = "청원 동의자 수 기준 조회", description = "동의자 수 많은 청원 5개를 조회합니다.")
+    @GetMapping("/view/agreeCount")
+    public ResponseEntity<List<PetitionResponseDto>> getAgreeCountPetitions() {
+        List<PetitionResponseDto> agreeCountPetitions = petitionService.getAgreeCountPetitions();
+        return ResponseEntity.ok(agreeCountPetitions);
+    }
 
 
     // 청원 수정

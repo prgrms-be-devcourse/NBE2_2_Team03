@@ -52,6 +52,12 @@ public class PetitionService {
         return petitionRepository.getEndDatePetitions(pageable);
     }
 
+    // 청원 동의자 순 5개 조회
+    public List<PetitionResponseDto> getAgreeCountPetitions() {
+        Pageable pageable = PageRequest.of(0, 5);
+        return petitionRepository.getAgreeCountPetitions(pageable);
+    }
+
     // 청원 수정
     @Transactional
     public PetitionResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
@@ -73,4 +79,5 @@ public class PetitionService {
         }
         petitionRepository.deleteById(petitionId);
     }
+
 }
