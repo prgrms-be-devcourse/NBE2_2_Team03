@@ -4,6 +4,7 @@ import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
+import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.exception.MemberNotFoundException;
 import com.example.echo.domain.petition.exception.PetitionNotFoundException;
@@ -42,8 +43,12 @@ public class PetitionService {
     }
 
     // 청원 전체 조회
-    public Page<PetitionResponseDto> getPetitions(Pageable pageable) {
-        return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
+    public Page<PetitionResponseDto> getPetitions(Pageable pageable, Category category) {
+        if (category != null) {
+            return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
+        } else {
+            return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
+        }
     }
 
     // 청원 만료일 순 5개 조회
