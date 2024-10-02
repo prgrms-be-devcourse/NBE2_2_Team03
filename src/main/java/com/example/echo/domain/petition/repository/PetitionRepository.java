@@ -16,4 +16,7 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
 
     @Query("SELECT p FROM Petition p ORDER BY p.endDate ASC")
     List<PetitionResponseDto> getEndDatePetitions(Pageable pageable);
+
+    @Query("SELECT p FROM Petition p ORDER BY p.agreeCount DESC")
+    List<PetitionResponseDto> getAgreeCountPetitions(Pageable pageable);
 }
