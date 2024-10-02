@@ -10,22 +10,33 @@ import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.repository.PetitionRepository;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 @Transactional
 class PetitionServiceTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private PetitionService petitionService;
@@ -36,13 +47,34 @@ class PetitionServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     private Member testMember;
+    private String accessToken;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         petitionRepository.deleteAll();
         memberRepository.deleteAll();
         testMember = createMember();
+        accessToken = loginAndGetToken(Role.ADMIN);
+    }
+
+    private String loginAndGetToken(Role role) throws Exception {
+        String userId = role == Role.USER ? "testUser" : "testAdmin";
+        String requestJson = "{"
+                + "\"userId\": \"" + userId + "\","
+                + "\"password\": \"password123\""
+                + "}";
+
+        String response = mockMvc.perform(post("/api/members/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        return JsonPath.parse(response).read("data.accessToken");
     }
 
     @Test
@@ -84,7 +116,7 @@ class PetitionServiceTest {
         pagingRequestDto.setDirection("desc");
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable(), pagingRequestDto.getCategory());
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
@@ -103,7 +135,7 @@ class PetitionServiceTest {
         pagingRequestDto.setDirection("desc");
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable(), pagingRequestDto.getCategory());
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
@@ -120,7 +152,7 @@ class PetitionServiceTest {
         pagingRequestDto.setCategory(Category.EDUCATION);
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable());
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable(), pagingRequestDto.getCategory());
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
@@ -181,10 +213,10 @@ class PetitionServiceTest {
      */
     private Member createMember() {
         Member member = Member.builder()
-                .userId("userid")
+                .userId("testAdmin")
                 .name("김관리")
                 .email("test@example.com")
-                .password("password123")
+                .password(passwordEncoder.encode("password123"))
                 .phone("010-1234-5678")
                 .avatarImage("default.jpg")
                 .role(Role.ADMIN)
