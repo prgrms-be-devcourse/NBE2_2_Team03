@@ -43,12 +43,13 @@ public class PetitionService {
     }
 
     // 청원 전체 조회
-    public Page<PetitionResponseDto> getPetitions(Pageable pageable, Category category) {
-        if (category != null) {
-            return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
-        } else {
-            return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
-        }
+    public Page<PetitionResponseDto> getPetitions(Pageable pageable) {
+        return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
+    }
+
+    // 청원 전체 조회 (카테고리별)
+    public Page<PetitionResponseDto> getPetitionsByCategory(Category category, Pageable pageable) {
+        return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
     }
 
     // 청원 만료일 순 5개 조회
@@ -61,6 +62,12 @@ public class PetitionService {
     public List<PetitionResponseDto> getAgreeCountPetitions() {
         Pageable pageable = PageRequest.of(0, 5);
         return petitionRepository.getAgreeCountPetitions(pageable);
+    }
+
+    // 청원 카테고리 선택 5개 조회 (랜덤 순)
+    public List<PetitionResponseDto> getRandomCategoryPetitions(Category category) {
+        Pageable pageable = PageRequest.of(0, 5);
+        return petitionRepository.getCategoryPetitionsInRandomOrder(category, pageable);
     }
 
     // 청원 수정
