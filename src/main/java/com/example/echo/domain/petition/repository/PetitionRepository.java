@@ -23,4 +23,8 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
 
     @Query("SELECT p FROM Petition p ORDER BY p.likesCount DESC")
     List<PetitionResponseDto> getLikesCountPetitions(Pageable pageable);
+
+    @Query("SELECT p FROM Petition p WHERE p.category = :category ORDER BY FUNCTION('RAND')")
+    List<PetitionResponseDto> getCategoryPetitionsInRandomOrder(@Param("category") Category category, Pageable pageable);
+
 }

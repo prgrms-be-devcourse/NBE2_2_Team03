@@ -3,6 +3,7 @@ package com.example.echo.domain.petition.service;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
@@ -30,18 +31,18 @@ public class PetitionService {
 
     // 청원 등록
     @Transactional
-    public PetitionResponseDto createPetition(PetitionRequestDto petitionDto) {
+    public PetitionDetailResponseDto createPetition(PetitionRequestDto petitionDto) {
         // 청원 등록을 위한 관리자 아이디 검색
         Member member = memberRepository.findById(petitionDto.getMemberId())
                 .orElseThrow(() -> new MemberNotFoundException(petitionDto.getMemberId()));
 
         Petition petition = petitionDto.toEntity(member);
-        return new PetitionResponseDto(petitionRepository.save(petition));
+        return new PetitionDetailResponseDto(petitionRepository.save(petition));
     }
 
     // 청원 단건 조회
     @Transactional // 요약 저장하는 경우 있음
-    public PetitionResponseDto getPetitionById(Long petitionId) {
+    public PetitionDetailResponseDto getPetitionById(Long petitionId) {
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(()
                 -> new PetitionNotFoundException(petitionId)); // 청원 번호 조회 없으면 예외
         // 청원 기간 만료 체크 -> 따로 서비스 층에 작성
@@ -54,7 +55,7 @@ public class PetitionService {
 
         if (summary != null) {
             // 내용 요약 있으면 바로 반환
-            return new PetitionResponseDto(petition);
+            return new PetitionDetailResponseDto(petition);
 
         } else {
             // 내용 요약 없으면 요약 진행 및 저장 후 반환
@@ -65,17 +66,18 @@ public class PetitionService {
             // null -> 요약된 내용으로 변경
             petition.changeSummary(summaryText);
             petitionRepository.save(petition);
-            return new PetitionResponseDto(petition);
+            return new PetitionDetailResponseDto(petition);
         }
     }
 
     // 청원 전체 조회
-    public Page<PetitionResponseDto> getPetitions(Pageable pageable, Category category) {
-        if (category != null) {
-            return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
-        } else {
-            return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
-        }
+    public Page<PetitionResponseDto> getPetitions(Pageable pageable) {
+        return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
+    }
+
+    // 청원 전체 조회 (카테고리별)
+    public Page<PetitionResponseDto> getPetitionsByCategory(Pageable pageable, Category category) {
+        return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
     }
 
     // 청원 만료일 순 5개 조회
@@ -90,9 +92,15 @@ public class PetitionService {
         return petitionRepository.getLikesCountPetitions(pageable);
     }
 
+    // 청원 카테고리 선택 5개 조회 (랜덤 순)
+    public List<PetitionResponseDto> getRandomCategoryPetitions(Category category) {
+        Pageable pageable = PageRequest.of(0, 5);
+        return petitionRepository.getCategoryPetitionsInRandomOrder(category, pageable);
+    }
+
     // 청원 수정
     @Transactional
-    public PetitionResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
+    public PetitionDetailResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
         Petition existingPetition = petitionRepository.findById(petitionId)
                 .orElseThrow(() -> new PetitionNotFoundException(petitionId));
 
@@ -100,7 +108,7 @@ public class PetitionService {
                 .orElseThrow(() -> new MemberNotFoundException(updatedPetitionDto.getMemberId()));
 
         Petition updatedPetition = updatedPetitionDto.toEntityWithExistingData(existingPetition, member);
-        return new PetitionResponseDto(petitionRepository.save(updatedPetition));
+        return new PetitionDetailResponseDto(petitionRepository.save(updatedPetition));
     }
 
     // 청원 삭제
