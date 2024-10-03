@@ -47,7 +47,7 @@ public class PetitionService {
         return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
     }
 
-    // 청원 전체 조회 (카테고리별)
+    // 청원 카테고리별 조회
     public Page<PetitionResponseDto> getPetitionsByCategory(Category category, Pageable pageable) {
         return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
     }

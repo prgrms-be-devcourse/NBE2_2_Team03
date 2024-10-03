@@ -3,14 +3,11 @@ package com.example.echo.domain.petition.service;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import com.example.echo.domain.member.repository.MemberRepository;
-import com.example.echo.domain.petition.dto.request.PagingRequestDto;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
-import com.example.echo.domain.petition.dto.request.SortBy;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.repository.PetitionRepository;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -47,38 +46,18 @@ class PetitionServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private Member testMember;
-    private String accessToken;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         petitionRepository.deleteAll();
         memberRepository.deleteAll();
         testMember = createMember();
-        accessToken = loginAndGetToken(Role.ADMIN);
-    }
-
-    private String loginAndGetToken(Role role) throws Exception {
-        String userId = role == Role.USER ? "testUser" : "testAdmin";
-        String requestJson = "{"
-                + "\"userId\": \"" + userId + "\","
-                + "\"password\": \"password123\""
-                + "}";
-
-        String response = mockMvc.perform(post("/api/members/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-
-        return JsonPath.parse(response).read("data.accessToken");
     }
 
     @Test
     @DisplayName("청원 생성")
+    @WithMockUser(username = "testAdmin", roles = "ADMIN")
     void createPetition() {
         // given
         PetitionRequestDto request = createPetitionRequest(testMember.getMemberId());
@@ -108,67 +87,81 @@ class PetitionServiceTest {
 
     @Test
     @DisplayName("청원 전체 조회 - 좋아요 순 정렬")
-    void getPetitions_SortByLikes() {
+    void getPetitions_SortByLikes() throws Exception {
         // given
         createMultiplePetitions(5);
-        PagingRequestDto pagingRequestDto = new PagingRequestDto();
-        pagingRequestDto.setSortBy(SortBy.LIKES_COUNT);
-        pagingRequestDto.setDirection("desc");
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "agreeCount"));
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable(), pagingRequestDto.getCategory());
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pageable);
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
         assertThat(petitions).hasSize(5);
-        // p2의 좋아요 수가 p1보다 많으면 양수 반환, 이는 정렬 알고리즘에 의해 p2가 앞에 오도록 처리
-        assertThat(petitions).isSortedAccordingTo((p1, p2) -> p2.getLikesCount().compareTo(p1.getLikesCount()));
+        assertThat(petitions).isSortedAccordingTo((p1, p2) -> p2.getAgreeCount().compareTo(p1.getAgreeCount()));
+
+        // API 호출 테스트
+        mockMvc.perform(get("/api/petitions")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "agreeCount,desc"))
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("청원 전체 조회 - 만료일 순 정렬")
-    void getPetitions_SortByExpirationDate() {
+    void getPetitions_SortByExpirationDate() throws Exception {
         // given
         createMultiplePetitions(5);
-        PagingRequestDto pagingRequestDto = new PagingRequestDto();
-        pagingRequestDto.setSortBy(SortBy.END_DATE);
-        pagingRequestDto.setDirection("desc");
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "endDate"));
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable(), pagingRequestDto.getCategory());
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pageable);
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
         assertThat(petitions).hasSize(5);
         assertThat(petitions).isSortedAccordingTo((p1, p2) -> p2.getEndDate().compareTo(p1.getEndDate()));
+
+        // API 호출 테스트
+        mockMvc.perform(get("/api/petitions")
+                        .param("page", "0")
+                        .param("size", "10")
+                        .param("sort", "endDate,desc"))
+                .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("청원 전체 조회 - 카테고리별 정렬")
-    void getPetitions_FilterByCategory() {
+    @DisplayName("청원 카테고리별 조회")
+    void getPetitions_FilterByCategory() throws Exception {
         // given
         createMultiplePetitions(10);
-        PagingRequestDto pagingRequestDto = new PagingRequestDto();
-        pagingRequestDto.setCategory(Category.EDUCATION);
+        Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitions(pagingRequestDto.toPageable(), pagingRequestDto.getCategory());
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitionsByCategory(Category.EDUCATION, pageable);
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
-        // petitions 컬렉션의 모든 요소(petition)의 카테고리가 EDUCATION 인지 확인
         assertThat(petitions).allMatch(petition -> petition.getCategory() == Category.EDUCATION);
+
+        // API 호출 테스트
+        mockMvc.perform(get("/api/petitions/category/EDUCATION")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("청원 수정")
+    @WithMockUser(username = "testAdmin", roles = "ADMIN")
     void updatePetition() {
         // given
-        Petition petition = createPetition(testMember); // 청원 생성
+        Petition petition = createPetition(testMember);
         LocalDateTime newStartDate = LocalDateTime.now().plusDays(1);
         LocalDateTime newEndDate = LocalDateTime.now().plusDays(31);
 
-        PetitionRequestDto updateRequest = PetitionRequestDto.builder() // 청원 수정 요청
+        PetitionRequestDto updateRequest = PetitionRequestDto.builder()
                 .memberId(testMember.getMemberId())
                 .title("수정된 청원 제목")
                 .content("수정된 청원 내용")
@@ -196,6 +189,7 @@ class PetitionServiceTest {
 
     @Test
     @DisplayName("청원 삭제")
+    @WithMockUser(username = "testAdmin", roles = "ADMIN")
     void deletePetition() {
         // given
         Petition petition = createPetition(testMember);
@@ -216,7 +210,7 @@ class PetitionServiceTest {
                 .userId("testAdmin")
                 .name("김관리")
                 .email("test@example.com")
-                .password(passwordEncoder.encode("password123"))
+                .password("password123")
                 .phone("010-1234-5678")
                 .avatarImage("default.jpg")
                 .role(Role.ADMIN)

@@ -1,6 +1,5 @@
 package com.example.echo.domain.petition.controller;
 
-import com.example.echo.domain.petition.dto.request.PagingRequestDto;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
@@ -48,7 +47,7 @@ public class PetitionController {
         return ResponseEntity.ok(petitions);
     }
 
-    // 청원 전체 조회 (카테고리별)
+    // 청원 카테고리별 조회
     @Operation(summary = "카테고리별 청원 조회", description = "특정 카테고리의 모든 청원을 페이지별로 조회합니다.")
     @GetMapping("/category/{category}")
     public ResponseEntity<Page<PetitionResponseDto>> getPetitionsByCategory(@PathVariable Category category,
