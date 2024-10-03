@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PetitionRepository extends JpaRepository<Petition, Long> {
-    Page<Petition> findByCategory(Category category, Pageable pageable);
+    Page<Petition> findByCategory(Pageable pageable, Category category);
 
     @Query("SELECT p FROM Petition p WHERE p.originalUrl = :originalUrl")
     Optional<Petition> findByUrl(@Param("originalUrl") String originUrl);

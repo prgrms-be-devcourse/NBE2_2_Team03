@@ -77,7 +77,7 @@ public class PetitionService {
 
     // 청원 전체 조회 (카테고리별)
     public Page<PetitionResponseDto> getPetitionsByCategory(Pageable pageable, Category category) {
-        return petitionRepository.findByCategory(category, pageable).map(PetitionResponseDto::new);
+        return petitionRepository.findByCategory(pageable, category).map(PetitionResponseDto::new);
     }
 
     // 청원 만료일 순 5개 조회
