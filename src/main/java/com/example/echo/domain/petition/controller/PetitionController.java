@@ -1,6 +1,7 @@
 package com.example.echo.domain.petition.controller;
 
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.service.PetitionService;
@@ -26,16 +27,16 @@ public class PetitionController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 등록", description = "새로운 청원을 등록합니다.")
     @PostMapping
-    public ResponseEntity<PetitionResponseDto> createPetition(@RequestBody PetitionRequestDto petitionDto) {
-        PetitionResponseDto createdPetition = petitionService.createPetition(petitionDto);
+    public ResponseEntity<PetitionDetailResponseDto> createPetition(@RequestBody PetitionRequestDto petitionDto) {
+        PetitionDetailResponseDto createdPetition = petitionService.createPetition(petitionDto);
         return ResponseEntity.ok(createdPetition);
     }
 
     // 청원 단건 조회
     @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
     @GetMapping("/{petitionId}")
-    public ResponseEntity<PetitionResponseDto> getPetitionById(@PathVariable Long petitionId) {
-        PetitionResponseDto petition = petitionService.getPetitionById(petitionId);
+    public ResponseEntity<PetitionDetailResponseDto> getPetitionById(@PathVariable Long petitionId) {
+        PetitionDetailResponseDto petition = petitionService.getPetitionById(petitionId);
         return ResponseEntity.ok(petition);
     }
 
@@ -84,8 +85,8 @@ public class PetitionController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 수정", description = "특정 ID의 청원을 수정합니다.")
     @PutMapping("/{petitionId}")
-    public ResponseEntity<PetitionResponseDto> updatePetition(@PathVariable Long petitionId, @RequestBody PetitionRequestDto petitionDto) {
-        PetitionResponseDto updatedPetition = petitionService.updatePetition(petitionId, petitionDto);
+    public ResponseEntity<PetitionDetailResponseDto> updatePetition(@PathVariable Long petitionId, @RequestBody PetitionRequestDto petitionDto) {
+        PetitionDetailResponseDto updatedPetition = petitionService.updatePetition(petitionId, petitionDto);
         return ResponseEntity.ok(updatedPetition);
     }
 

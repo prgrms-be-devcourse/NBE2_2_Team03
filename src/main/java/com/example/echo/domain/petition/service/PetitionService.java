@@ -3,6 +3,7 @@ package com.example.echo.domain.petition.service;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
@@ -26,19 +27,19 @@ public class PetitionService {
 
     // 청원 등록
     @Transactional
-    public PetitionResponseDto createPetition(PetitionRequestDto petitionDto) {
+    public PetitionDetailResponseDto createPetition(PetitionRequestDto petitionDto) {
         // 청원 등록을 위한 관리자 아이디 검색
         Member member = memberRepository.findById(petitionDto.getMemberId())
                 .orElseThrow(() -> new MemberNotFoundException(petitionDto.getMemberId()));
 
         Petition petition = petitionDto.toEntity(member);
-        return new PetitionResponseDto(petitionRepository.save(petition));
+        return new PetitionDetailResponseDto(petitionRepository.save(petition));
     }
 
     // 청원 단건 조회
-    public PetitionResponseDto getPetitionById(Long petitionId) {
+    public PetitionDetailResponseDto getPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId)
-                .map(PetitionResponseDto::new)
+                .map(PetitionDetailResponseDto::new)
                 .orElseThrow(() -> new PetitionNotFoundException(petitionId));
     }
 
@@ -72,7 +73,7 @@ public class PetitionService {
 
     // 청원 수정
     @Transactional
-    public PetitionResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
+    public PetitionDetailResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
         Petition existingPetition = petitionRepository.findById(petitionId)
                 .orElseThrow(() -> new PetitionNotFoundException(petitionId));
 
@@ -80,7 +81,7 @@ public class PetitionService {
                 .orElseThrow(() -> new MemberNotFoundException(updatedPetitionDto.getMemberId()));
 
         Petition updatedPetition = updatedPetitionDto.toEntityWithExistingData(existingPetition, member);
-        return new PetitionResponseDto(petitionRepository.save(updatedPetition));
+        return new PetitionDetailResponseDto(petitionRepository.save(updatedPetition));
     }
 
     // 청원 삭제
@@ -91,5 +92,4 @@ public class PetitionService {
         }
         petitionRepository.deleteById(petitionId);
     }
-
 }
