@@ -1,4 +1,3 @@
-
 package com.example.echo.domain.petition.dto.response;
 
 import com.example.echo.domain.petition.entity.Category;

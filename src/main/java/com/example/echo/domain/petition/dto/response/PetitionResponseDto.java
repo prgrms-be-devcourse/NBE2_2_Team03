@@ -9,30 +9,20 @@ import java.time.LocalDateTime;
 @Getter
 public class PetitionResponseDto {
     private Long petitionId;
-    private Long memberId;
     private String title;
-    private String content;
-    private String summary;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Category category;
-    private String originalUrl;
-    private String relatedNews;
     private Integer likesCount;
     private Integer interestCount;
     private Integer agreeCount;
 
     public PetitionResponseDto(Petition petition) {
         this.petitionId = petition.getPetitionId();
-        this.memberId = petition.getMember().getMemberId();
         this.title = petition.getTitle();
-        this.content = petition.getContent();
-        this.summary = petition.getSummary();
         this.startDate = petition.getStartDate();
         this.endDate = petition.getEndDate();
         this.category = petition.getCategory();
-        this.originalUrl = petition.getOriginalUrl();
-        this.relatedNews = petition.getRelatedNews();
         this.likesCount = petition.getLikesCount();
         this.interestCount = petition.getInterestCount();
         this.agreeCount = petition.getAgreeCount();
