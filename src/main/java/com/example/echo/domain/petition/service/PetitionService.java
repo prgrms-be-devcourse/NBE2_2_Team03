@@ -60,8 +60,7 @@ public class PetitionService {
             // 내용 요약 없으면 요약 진행 및 저장 후 반환
             String content = petition.getContent(); // 원본 내용
             // 줄바꿈 문단 처리 방식 -> 공백 전부 제거 or 줄바꿈은 유지
-            String originText = content.trim().replaceAll("[ \\t]+", " ")
-                                                .replaceAll("\\s*\\n\\s*", "\n\n");
+            String originText = content.replaceAll("\\s+", " ");
             String summaryText = summarizationService.getSummarizedText(originText); // 요약 결과
             // null -> 요약된 내용으로 변경
             petition.changeSummary(summaryText);
@@ -123,7 +122,7 @@ public class PetitionService {
         // 현재 형식이 LocalDateTime 만료일 00:00:00
         // 청원 만료일 오후 3시 일 경우 만료 전이나 이미 만료됐다고 판단
         // 만료일 + 1 을 기준으로 체크
-        return petition.getEndDate().plusDays(1).isBefore(LocalDateTime.now());
+        return petition.getEndDate().plusDays(1).isBefore(LocalDateTime.now()); // 만료일이 지난 경우 true
     }
 
 }
