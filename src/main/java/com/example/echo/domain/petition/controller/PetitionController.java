@@ -5,7 +5,6 @@ import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.service.PetitionService;
-import com.example.echo.domain.petition.service.SummarizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 public class PetitionController {
 
     private final PetitionService petitionService;
-    private final SummarizationService summarizationService;
 
     // 청원 등록
     @PreAuthorize("hasRole('ADMIN')")

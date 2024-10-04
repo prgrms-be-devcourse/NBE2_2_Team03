@@ -47,7 +47,7 @@ public class PetitionService {
                 -> new PetitionNotFoundException(petitionId)); // 청원 번호 조회 없으면 예외
         // 청원 기간 만료 체크 -> 따로 서비스 층에 작성
         //  위에서 exception 발생 안함 = 청원이 존재한다는 뜻 -> 단순 날짜 비교만 진행
-        if ( isExpired(petition) ) { // 만료되었으면 예외 발생
+        if (isExpired(petition)) { // 만료되었으면 예외 발생
             throw new PetitionNotFoundException(petitionId);
         }
 
