@@ -81,4 +81,8 @@ public class Petition {
     public int getLikesCount() {
         return likesCount;
     }
+
+    public void changeSummary(String summary) {
+        this.summary = summary;
+    }
 }

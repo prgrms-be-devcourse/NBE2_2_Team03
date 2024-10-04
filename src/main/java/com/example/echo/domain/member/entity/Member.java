@@ -58,7 +58,10 @@ public class Member {
     @Builder.Default
     private List<Interest> interestList = new ArrayList<>();    // 객체 생성 시 빈 리스트 초기화
 
-    @OneToMany(mappedBy = "member")
+    // member 데이터를 삭제하려면 그 멤버와 관련된 inquiry 데이터를 먼저 처리해야 한다.
+    // 데이터베이스에서 부모 테이블인 member 테이블의 데이터를 삭제하려 할 때,
+    // 자식 테이블인 inquiry에서 여전히 참조 중인 경우 제약 조건에 의해 삭제 거부되므로 이 문제를 해결하기 위해 cascade 조건을 추가하였습니다.
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Inquiry> inquiryList = new ArrayList<>();      // Member 객체 생성 시 1:1 문의 비어 있는 리스트 초기화
 

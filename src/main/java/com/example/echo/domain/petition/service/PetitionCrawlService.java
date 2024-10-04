@@ -263,5 +263,4 @@ public class PetitionCrawlService {
             logger.error("TimeoutException | NoSuchElementException while fetching: ", e);
         }
     }
-
 }
