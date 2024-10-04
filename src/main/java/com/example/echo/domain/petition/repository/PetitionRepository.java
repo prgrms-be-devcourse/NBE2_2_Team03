@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface PetitionRepository extends JpaRepository<Petition, Long> {
-    Page<Petition> findByCategory(Category category, Pageable pageable);
+    Page<Petition> findByCategory(Pageable pageable, Category category);
 
     @Query("SELECT p FROM Petition p WHERE p.originalUrl = :originalUrl")
     Optional<Petition> findByUrl(@Param("originalUrl") String originUrl);
@@ -21,9 +21,10 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
     @Query("SELECT p FROM Petition p ORDER BY p.endDate ASC")
     List<PetitionResponseDto> getEndDatePetitions(Pageable pageable);
 
-    @Query("SELECT p FROM Petition p ORDER BY p.agreeCount DESC")
-    List<PetitionResponseDto> getAgreeCountPetitions(Pageable pageable);
+    @Query("SELECT p FROM Petition p ORDER BY p.likesCount DESC")
+    List<PetitionResponseDto> getLikesCountPetitions(Pageable pageable);
 
     @Query("SELECT p FROM Petition p WHERE p.category = :category ORDER BY FUNCTION('RAND')")
     List<PetitionResponseDto> getCategoryPetitionsInRandomOrder(@Param("category") Category category, Pageable pageable);
+
 }

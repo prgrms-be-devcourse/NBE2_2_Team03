@@ -140,7 +140,7 @@ class PetitionServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // when
-        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitionsByCategory(Category.EDUCATION, pageable);
+        Page<PetitionResponseDto> petitionsPage = petitionService.getPetitionsByCategory(pageable, Category.EDUCATION);
 
         // then
         List<PetitionResponseDto> petitions = petitionsPage.getContent();
