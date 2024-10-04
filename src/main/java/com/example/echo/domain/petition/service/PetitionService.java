@@ -85,9 +85,9 @@ public class PetitionService {
     }
 
     // 청원 동의자 순 5개 조회
-    public List<PetitionResponseDto> getAgreeCountPetitions() {
+    public List<PetitionResponseDto> getLikesCountPetitions() {
         Pageable pageable = PageRequest.of(0, 5);
-        return petitionRepository.getAgreeCountPetitions(pageable);
+        return petitionRepository.getLikesCountPetitions(pageable);
     }
 
     // 청원 수정
