@@ -4,6 +4,7 @@ import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
@@ -63,7 +64,7 @@ class PetitionServiceTest {
         PetitionRequestDto request = createPetitionRequest(testMember.getMemberId());
 
         // when
-        PetitionResponseDto response = petitionService.createPetition(request);
+        PetitionDetailResponseDto response = petitionService.createPetition(request);
 
         // then
         assertThat(response).isNotNull();
@@ -78,7 +79,7 @@ class PetitionServiceTest {
         Petition petition = createPetition(testMember);
 
         // when
-        PetitionResponseDto response = petitionService.getPetitionById(petition.getPetitionId());
+        PetitionDetailResponseDto response = petitionService.getPetitionById(petition.getPetitionId());
 
         // then
         assertThat(response).isNotNull();
@@ -174,7 +175,7 @@ class PetitionServiceTest {
                 .build();
 
         // when
-        PetitionResponseDto updatedPetition = petitionService.updatePetition(petition.getPetitionId(), updateRequest);
+        PetitionDetailResponseDto updatedPetition = petitionService.updatePetition(petition.getPetitionId(), updateRequest);
 
         // then
         assertThat(updatedPetition.getTitle()).isEqualTo("수정된 청원 제목");
