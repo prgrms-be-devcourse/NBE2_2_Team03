@@ -33,12 +33,7 @@ public class PetitionController {
     }
 
     // 청원 단건 조회
-    @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
-    @GetMapping("/{petitionId}")
-    public ResponseEntity<PetitionDetailResponseDto> getPetitionById(@PathVariable Long petitionId) {
-        PetitionDetailResponseDto petition = petitionService.getPetitionById(petitionId);
-        return ResponseEntity.ok(petition);
-    }
+
 
     // 청원 전체 조회
     @Operation(summary = "청원 전체 조회", description = "모든 청원을 페이지별로 조회합니다.")
@@ -56,12 +51,12 @@ public class PetitionController {
         return ResponseEntity.ok(endDatePetitions);
     }
 
-    // 청원 좋아요 순 5개 조회
-    @Operation(summary = "청원 좋아요 수 기준 조회", description = "좋아요 수 많은 청원 5개를 조회합니다.")
-    @GetMapping("/view/likesCount")
-    public ResponseEntity<List<PetitionResponseDto>> getLikesCountPetitions() {
-        List<PetitionResponseDto> likesCountPetitions = petitionService.getLikesCountPetitions();
-        return ResponseEntity.ok(likesCountPetitions);
+    // 청원 동의자 순 5개 조회
+    @Operation(summary = "청원 동의자 수 기준 조회", description = "동의자 수 많은 청원 5개를 조회합니다.")
+    @GetMapping("/view/agreeCount")
+    public ResponseEntity<List<PetitionResponseDto>> getAgreeCountPetitions() {
+        List<PetitionResponseDto> agreeCountPetitions = petitionService.getAgreeCountPetitions();
+        return ResponseEntity.ok(agreeCountPetitions);
     }
 
     // 청원 카테고리 선택 5개 조회
