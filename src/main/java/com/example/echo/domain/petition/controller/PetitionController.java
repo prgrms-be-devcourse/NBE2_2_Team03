@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "Petition Controller", description = "청원 관리 API")
 public class PetitionController {
-
     private final PetitionService petitionService;
 
     // 청원 등록
@@ -75,5 +74,23 @@ public class PetitionController {
     public ResponseEntity<Void> deletePetitionById(@PathVariable Long petitionId) {
         petitionService.deletePetitionById(petitionId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 청원 좋아요 기능
+    //@PreAuthorize("authentication.principal.memberId == #memberId")
+    @PostMapping("/{petitionId}/like")
+    public ResponseEntity<String> toggleLike(
+            @PathVariable Long petitionId,
+            @RequestParam(required = false) Long memberId) {
+        ResponseEntity<String> response = petitionService.toggleLikeOnPetition(petitionId, memberId);
+        return response;
+    }
+
+    // 청원 좋아요 순으로 5 조회
+    @Operation(summary = "청원 좋아요 순 전체 조회", description = "좋아요 수 많은 청원 5개를 조회합니다.")
+    @GetMapping("/view/likeCount")
+    public ResponseEntity<List<PetitionResponseDto>> getPetitionsByLikeCount() {
+        List<PetitionResponseDto> petitions = petitionService.getPetitionsByLikeCount();
+        return ResponseEntity.ok(petitions);
     }
 }
