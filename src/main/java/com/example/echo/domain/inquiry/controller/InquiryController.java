@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class InquiryController {
 
     private final InquiryService inquiryService;
-    private final InquiryRepository inquiryRepository;
 
     // USER 회원 1:1 문의 등록
     @PreAuthorize("authentication.principal.memberId == #inquiryRequestDTO.memberId")

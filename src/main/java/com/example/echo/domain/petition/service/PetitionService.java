@@ -12,7 +12,6 @@ import com.example.echo.domain.petition.exception.MemberNotFoundException;
 import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -145,7 +144,7 @@ public class PetitionService {
         List<Petition> petitions = petitionRepository.findAll(Sort.by(Sort.Direction.DESC, "interestCount"));
 
         return petitions.stream()
-            .map(petition -> new InterestPetitionResponseDTO(petition))  // DTO로 변환
+            .map(InterestPetitionResponseDTO::new)  // DTO로 변환
             .collect(Collectors.toList());
     }
 
