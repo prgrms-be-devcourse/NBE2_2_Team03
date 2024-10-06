@@ -5,7 +5,6 @@ import com.example.echo.domain.inquiry.dto.request.InquiryPageRequestDTO;
 import com.example.echo.domain.inquiry.dto.request.InquiryRequestDTO;
 import com.example.echo.domain.inquiry.dto.request.InquiryUpdateRequestDTO;
 import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
-import com.example.echo.domain.inquiry.repository.InquiryRepository;
 import com.example.echo.domain.inquiry.service.InquiryService;
 import com.example.echo.global.api.ApiResponse;
 import lombok.RequiredArgsConstructor;
