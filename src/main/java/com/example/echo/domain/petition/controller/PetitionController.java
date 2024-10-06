@@ -52,8 +52,8 @@ public class PetitionController {
     @Operation(summary = "카테고리별 청원 조회", description = "특정 카테고리의 모든 청원을 페이지별로 조회합니다.")
     @GetMapping("/category/{category}")
     public ResponseEntity<Page<PetitionResponseDto>> getPetitionsByCategory(@PathVariable Category category,
-            Pageable pageable) {
-        Page<PetitionResponseDto> petitions = petitionService.getPetitionsByCategory( pageable, category);
+                                                                            Pageable pageable) {
+        Page<PetitionResponseDto> petitions = petitionService.getPetitionsByCategory(pageable, category);
         return ResponseEntity.ok(petitions);
     }
 
@@ -79,6 +79,14 @@ public class PetitionController {
     public ResponseEntity<List<PetitionResponseDto>> getRandomCategoryPetitions(@PathVariable Category category) {
         List<PetitionResponseDto> categoryPetitions = petitionService.getRandomCategoryPetitions(category);
         return ResponseEntity.ok(categoryPetitions);
+    }
+
+    // 제목으로 청원 검색
+    @Operation(summary = "청원 제목으로 검색", description = "제목에 검색어가 포함된 청원을 조회합니다.")
+    @GetMapping("/search")
+    public ResponseEntity<List<PetitionDetailResponseDto>> searchPetitions(@RequestParam String query) {
+        List<PetitionDetailResponseDto> petitions = petitionService.searchPetitionsByTitle(query);
+        return ResponseEntity.ok(petitions);
     }
 
     // 청원 수정

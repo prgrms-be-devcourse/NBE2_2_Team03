@@ -25,13 +25,25 @@ const App = () => {
         { id: 2, title: "청원 제목 2", description: "청원 설명 2", category: "카테고리 2", date: "2024-01-02", status: "진행 중" },
         { id: 3, title: "청원 제목 3", description: "청원 설명 3", category: "카테고리 3", date: "2024-01-03", status: "종료" },
     ]);
-
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const handleProfileUpdate = (updatedUser) => {
         setUser(updatedUser);
         setIsProfileModalOpen(false);
     };
+
+    useEffect(() => {
+        const fetchPetitions = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/api/petitions');
+                setPetitions(response.data);
+            } catch (error) {
+                console.error('Error fetching petitions:', error);
+            }
+        };
+
+        fetchPetitions();
+    }, []);
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-100">
@@ -43,7 +55,7 @@ const App = () => {
                 setIsProfileModalOpen={setIsProfileModalOpen}
             />
             <main className="flex-grow container mx-auto px-4 py-8">
-                {currentPage === 'home' && <HomePage />}
+                {currentPage === 'home' && <HomePage petitions={petitions} />}
                 {currentPage === 'login' &&
                     <LoginPage
                         setIsLoggedIn={setIsLoggedIn}
@@ -56,7 +68,7 @@ const App = () => {
                 {currentPage === 'memberInfo' && (
                     <MemberInfo
                         user={user}
-                        setUser={setUser} // setUser 전달
+                        setUser={setUser}
                     />
                 )}
                 {isProfileModalOpen && (

@@ -13,6 +13,8 @@ import com.example.echo.domain.petition.repository.PetitionRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -131,6 +133,14 @@ public class PetitionService {
         // 청원 만료일 오후 3시 일 경우 만료 전이나 이미 만료됐다고 판단
         // 만료일 + 1 을 기준으로 체크
         return petition.getEndDate().plusDays(1).isBefore(LocalDateTime.now()); // 만료일이 지난 경우 true
+    }
+
+    // 제목으로 청원 검색
+    public List<PetitionDetailResponseDto> searchPetitionsByTitle(String query) {
+        List<Petition> petitions = petitionRepository.findByTitleContainingIgnoreCase(query);
+        return petitions.stream()
+                .map(PetitionDetailResponseDto::new)
+                .collect(Collectors.toList());
     }
 
 }
