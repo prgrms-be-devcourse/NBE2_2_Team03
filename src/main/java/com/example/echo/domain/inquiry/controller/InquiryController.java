@@ -8,7 +8,6 @@ import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
 import com.example.echo.domain.inquiry.repository.InquiryRepository;
 import com.example.echo.domain.inquiry.service.InquiryService;
 import com.example.echo.global.api.ApiResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ public class InquiryController {
     private final InquiryRepository inquiryRepository;
 
     // USER 회원 1:1 문의 등록
-    @PreAuthorize("authentication.principal.memberId == #InquiryRequestDTO.memberId")
+    @PreAuthorize("authentication.principal.memberId == #inquiryRequestDTO.memberId")
     @PostMapping
     public ResponseEntity<InquiryResponseDTO> registerInquiry(@RequestBody InquiryRequestDTO inquiryRequestDTO) {
         InquiryResponseDTO registeredInquiry = inquiryService.createInquiry(inquiryRequestDTO);
@@ -48,7 +47,7 @@ public class InquiryController {
     }
 
     //1:1문의 수정
-    @PreAuthorize("authentication.principal.memberId == #inquiryRequestDTO.memberId")
+    @PreAuthorize("@inquiryService.isInquiryOwer(#inquiryId,authentication.principal.memberId)")
     @PutMapping("/{inquiryId}")
     public ResponseEntity<ApiResponse<InquiryResponseDTO>> updateInquiry(@PathVariable Long inquiryId, @RequestBody InquiryUpdateRequestDTO inquiryUpdateRequestDTO) {
         InquiryResponseDTO updatedInquiry = inquiryService.updateInquiry(inquiryId, inquiryUpdateRequestDTO);
@@ -66,7 +65,7 @@ public class InquiryController {
     // 관리자 답변
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{inquiryId}/answer")
-    public ResponseEntity<ApiResponse<Void>> addAnswer(@PathVariable Long inquiryId, @RequestBody AdminAnswerRequestDTO adminAnswerRequestDTO) {
+    public ResponseEntity<ApiResponse<InquiryResponseDTO>> addAnswer(@PathVariable Long inquiryId, @RequestBody AdminAnswerRequestDTO adminAnswerRequestDTO) {
         inquiryService.addAnswer(inquiryId, adminAnswerRequestDTO.getReplyContent());
         return ResponseEntity.ok(ApiResponse.success(null));
 }

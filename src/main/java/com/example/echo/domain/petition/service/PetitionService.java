@@ -128,10 +128,9 @@ public class PetitionService {
     }
 
     //관심 목록 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public List<InterestPetitionResponseDTO> getInterestList(Member member) {
         List<Long> interestList = member.getInterestList();
-
         return interestList.stream()
                 .map(petitionId -> {
                     Petition petition = petitionRepository.findById(petitionId)

@@ -1,9 +1,9 @@
 package com.example.echo.domain.petition.dto.request;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+@Data
 @NoArgsConstructor
 public class InterestRequestDTO {
     private Long petitionId;

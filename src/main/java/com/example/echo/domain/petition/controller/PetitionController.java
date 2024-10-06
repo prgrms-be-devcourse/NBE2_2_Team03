@@ -88,7 +88,8 @@ public class PetitionController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('USER')")
+    //관심목록 추가
+    @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @PostMapping("/interestAdd")
     public ResponseEntity<?> addInterestt(@RequestBody InterestRequestDTO requestDTO) {
         try {
@@ -101,7 +102,8 @@ public class PetitionController {
         }
     }
 
-    @PreAuthorize("hasRole('USER')")
+    // 관심목록 제거
+    @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @PostMapping("/interestRemove")
     public ResponseEntity<?> removeInterest(@RequestBody InterestRequestDTO requestDTO) {
         try {
@@ -114,6 +116,8 @@ public class PetitionController {
         }
     }
 
+
+    //나의 관심 목록 조회
     @PreAuthorize("hasRole('USER')" )
     @GetMapping("/Myinterest")
     public ResponseEntity<?> getInterestList(@AuthenticationPrincipal Member member) {
@@ -125,6 +129,8 @@ public class PetitionController {
             return ResponseEntity.badRequest().body("관심 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
+
+    // 관심 목록 수에따라 정렬
     @GetMapping("/interests")
     public ResponseEntity<?> getPetitionsByInterestCount() {
         try {
