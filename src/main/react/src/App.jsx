@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Header from './components/Header.jsx';
 import HomePage from './components/HomePage.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
@@ -43,12 +44,28 @@ const App = () => {
             />
             <main className="flex-grow container mx-auto px-4 py-8">
                 {currentPage === 'home' && <HomePage />}
-                {currentPage === 'login' && <LoginPage setIsLoggedIn={setIsLoggedIn} setCurrentPage={setCurrentPage} />}
+                {currentPage === 'login' &&
+                    <LoginPage
+                        setIsLoggedIn={setIsLoggedIn}
+                        setCurrentPage={setCurrentPage}
+                        setUser={setUser}
+                    />}
                 {currentPage === 'inquiries' && isLoggedIn && <InquiriesPage inquiries={inquiries} setInquiries={setInquiries} />}
                 {currentPage === 'petitions' && <AllPetitionsPage petitions={petitions} />}
                 {currentPage === 'signup' && <SignUpPage />}
-                {currentPage === 'memberInfo' && <MemberInfo />}
-                {isProfileModalOpen && <ProfileModal user={user} onUpdate={handleProfileUpdate} />}
+                {currentPage === 'memberInfo' && (
+                    <MemberInfo
+                        user={user}
+                        setUser={setUser} // setUser 전달
+                    />
+                )}
+                {isProfileModalOpen && (
+                    <ProfileModal
+                        user={user}
+                        onUpdate={handleProfileUpdate}
+                        setIsProfileModalOpen={setIsProfileModalOpen}
+                    />
+                )}
             </main>
             <Footer />
         </div>
