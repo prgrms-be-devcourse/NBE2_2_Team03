@@ -65,12 +65,21 @@ public class PetitionController {
         return ResponseEntity.ok(endDatePetitions);
     }
 
-    // 청원 동의자 순 5개 조회
+    // 청원 좋아요 순 5개 조회
     @Operation(summary = "청원 좋아요 수 기준 조회", description = "좋아요 수 많은 청원 5개를 조회합니다.")
     @GetMapping("/view/likesCount")
     public ResponseEntity<List<PetitionResponseDto>> getLikesCountPetitions() {
         List<PetitionResponseDto> likesCountPetitions = petitionService.getLikesCountPetitions();
         return ResponseEntity.ok(likesCountPetitions);
+    }
+
+    // 청원 좋아요 기능
+    @PreAuthorize("authentication.principal.memberId == #memberId")
+    @PostMapping("/{petitionId}/like")
+    public ResponseEntity<String> toggleLike(
+            @PathVariable Long petitionId,
+            @RequestParam(required = false) Long memberId) {
+        return petitionService.toggleLikeOnPetition(petitionId, memberId);
     }
 
     // 청원 카테고리 선택 5개 조회
