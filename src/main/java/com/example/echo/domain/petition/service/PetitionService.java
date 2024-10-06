@@ -53,7 +53,7 @@ public class PetitionService {
 
         String summary = petition.getSummary(); // 요약 내용 체크
 
-        if (summary != null) {
+        if (summary != null && !summary.isEmpty()) {
             // 내용 요약 있으면 바로 반환
             return new PetitionDetailResponseDto(petition);
 
