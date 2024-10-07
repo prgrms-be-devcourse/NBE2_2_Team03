@@ -48,9 +48,8 @@ public class PetitionController {
     // 청원 전체 조회
     @Operation(summary = "청원 전체 조회", description = "모든 청원을 페이지별로 조회합니다.")
     @GetMapping
-
     public ResponseEntity<Page<PetitionResponseDto>> getPetitions(Pageable pageable) {
-        Page<PetitionResponseDto> petitions = petitionService.getPetitions(pageable);
+        Page<PetitionResponseDto> petitions = petitionService.getOngoingPetitions(pageable);
         return ResponseEntity.ok(petitions);
     }
 
@@ -151,7 +150,7 @@ public class PetitionController {
     }
 
 
-    //나의 관심 목록 조회
+    // 나의 관심 목록 조회
     @PreAuthorize("hasRole('USER')" )
     @GetMapping("/Myinterest")
     public ResponseEntity<?> getInterestList(@AuthenticationPrincipal Member member) {
@@ -164,7 +163,7 @@ public class PetitionController {
         }
     }
 
-    // 관심 목록 수에따라 정렬
+    // 관심 목록 수에 따라 정렬
     @GetMapping("/interests")
     public ResponseEntity<?> getPetitionsByInterestCount() {
         try {
