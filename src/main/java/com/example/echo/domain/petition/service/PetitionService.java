@@ -4,6 +4,7 @@ import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.InterestRequestDTO;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.InterestPetitionResponseDTO;
 import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -166,6 +168,63 @@ public class PetitionService {
         // 청원 만료일 오후 3시 일 경우 만료 전이나 이미 만료됐다고 판단
         // 만료일 + 1 을 기준으로 체크
         return petition.getEndDate().plusDays(1).isBefore(LocalDateTime.now()); // 만료일이 지난 경우 true
+    }
+
+     // 관심목록 추가 & count+1
+    @Transactional
+    public void addInterest(InterestRequestDTO interestRequestDTO) {
+        Petition petition = petitionRepository.findById(interestRequestDTO.getPetitionId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 청원을 찾을 수 없습니다."));
+        Member member = memberRepository.findById(interestRequestDTO.getMemberId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 회원을 찾을 수 없습니다."));
+
+        if (!member.getInterestList().contains(interestRequestDTO.getPetitionId())) {
+            petition.setInterestCount(petition.getInterestCount() + 1);
+            member.getInterestList().add(interestRequestDTO.getPetitionId());
+
+            petitionRepository.save(petition);
+            memberRepository.save(member);
+        }
+    }
+
+    //관심목록 제거 & count-1
+    @Transactional
+    public void removeInterest(InterestRequestDTO interestRequestDTO) {
+        Petition petition = petitionRepository.findById(interestRequestDTO.getPetitionId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 청원을 찾을 수 없습니다."));
+        Member member = memberRepository.findById(interestRequestDTO.getMemberId())
+                .orElseThrow(() -> new EntityNotFoundException("해당하는 회원을 찾을 수 없습니다."));
+
+        if (member.getInterestList().contains(interestRequestDTO.getPetitionId())) {
+            petition.setInterestCount(petition.getInterestCount() - 1);
+            member.getInterestList().remove(interestRequestDTO.getPetitionId());
+
+            petitionRepository.save(petition);
+            memberRepository.save(member);
+        }
+    }
+
+    //관심 목록 조회
+    @Transactional(readOnly = true)
+    public List<InterestPetitionResponseDTO> getInterestList(Member member) {
+        List<Long> interestList = member.getInterestList();
+
+        return interestList.stream()
+                .map(petitionId -> {
+                    Petition petition = petitionRepository.findById(petitionId)
+                            .orElseThrow(() -> new EntityNotFoundException("해당하는 청원ID를 찾을 수 없습니다 : " + petitionId));
+                    return new InterestPetitionResponseDTO(petition);
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<InterestPetitionResponseDTO> getPetitionsByInterestCount() {
+        List<Petition> petitions = petitionRepository.findAll(Sort.by(Sort.Direction.DESC, "interestCount"));
+
+        return petitions.stream()
+            .map(InterestPetitionResponseDTO::new)  // DTO로 변환
+            .collect(Collectors.toList());
     }
 
     // 제목으로 청원 검색

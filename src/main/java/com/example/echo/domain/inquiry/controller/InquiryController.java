@@ -45,7 +45,7 @@ public class InquiryController {
     }
 
     //1:1문의 수정
-    @PreAuthorize("@inquiryService.isInquiryOwer(#inquiryId,authentication.principal.memberId)")
+    @PreAuthorize("@inquiryService.isInquiryOwner(#inquiryId,authentication.principal.memberId)")
     @PutMapping("/{inquiryId}")
     public ResponseEntity<ApiResponse<InquiryResponseDTO>> updateInquiry(@PathVariable Long inquiryId, @RequestBody InquiryUpdateRequestDTO inquiryUpdateRequestDTO) {
         InquiryResponseDTO updatedInquiry = inquiryService.updateInquiry(inquiryId, inquiryUpdateRequestDTO);
@@ -67,10 +67,5 @@ public class InquiryController {
         inquiryService.addAnswer(inquiryId, adminAnswerRequestDTO.getReplyContent());
         return ResponseEntity.ok(ApiResponse.success(null));
 }
-
-
-
-
-
 }
 
