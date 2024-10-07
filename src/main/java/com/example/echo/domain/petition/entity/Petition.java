@@ -72,6 +72,7 @@ public class Petition {
     public void changeAgreeCount(int agreeCount) {this.agreeCount = agreeCount;}
 
     @ElementCollection
+    @Builder.Default
     private Set<Long> likedMemberIds = new HashSet<>();
 
     // 좋아요를 추가하거나 제거

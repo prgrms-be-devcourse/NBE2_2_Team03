@@ -27,22 +27,22 @@ public class Member {
     @Column(name = "member_id", nullable = false, unique = true)
     private Long memberId;
 
-    @Column(name = "user_id", nullable = false, length = 255, unique = true)
+    @Column(name = "user_id", nullable = false, unique = true)
     private String userId;  // 로그인 유저아이디 추가 username을  userId로 변경
 
-    @Column(name = "name", nullable = false, length = 255)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "email", nullable = false, length = 255, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "phone", nullable = false, length = 20)
     private String phone;
 
-    @Column(name = "avatar_image", length = 255)
+    @Column(name = "avatar_image")
     private String avatarImage;
 
     @Enumerated(EnumType.STRING)
@@ -56,6 +56,7 @@ public class Member {
     @ElementCollection
     @CollectionTable(name = "member_interests", joinColumns = @JoinColumn(name = "member_id"))
     @Column(name = "petition_id")
+    @Builder.Default
     private List<Long> interestList = new ArrayList<>();    // 객체 생성 시 빈 리스트 초기화
 
     // member 데이터를 삭제하려면 그 멤버와 관련된 inquiry 데이터를 먼저 처리해야 한다.
