@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InquiryResponseDTO {
+public class InquiryResponse {
 
     private Long inquiryId;
     private Long memberId;
@@ -26,8 +26,8 @@ public class InquiryResponseDTO {
     private InquiryStatus inquiryStatus;
     private LocalDateTime repliedDate;
 
-    public static InquiryResponseDTO from(Inquiry inquiry) {
-        return InquiryResponseDTO.builder()
+    public static InquiryResponse from(Inquiry inquiry) {
+        return InquiryResponse.builder()
                 .inquiryId(inquiry.getInquiryId())
                 .memberId(inquiry.getMember().getMemberId())
                 .inquiryCategory(inquiry.getInquiryCategory())
