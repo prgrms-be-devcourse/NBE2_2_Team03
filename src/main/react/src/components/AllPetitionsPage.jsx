@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import SearchBar from './SearchBar.jsx';
 
 const categories = [
@@ -31,6 +31,7 @@ const sortOptions = [
 ];
 
 const AllPetitionsPage = () => {
+    const location = useLocation();
     const [petitions, setPetitions] = useState([]);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,21 +43,43 @@ const AllPetitionsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        const fetchPetitions = async () => {
+        const fetchData = async () => {
+            const params = new URLSearchParams(location.search);
+            const query = params.get('query');
             setIsLoading(true);
             try {
-                const response = await fetch(`http://localhost:8000/api/petitions?page=${currentPage}&size=${itemsPerPage}&category=${selectedCategory}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                let response;
+                if (query) {
+                    setSearchQuery(query);
+                    // 검색 요청
+                    response = await fetch(`http://localhost:8000/api/petitions/search?query=${query}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                } else {
+                    // 검색어가 없을 경우 원래 청원 목록 가져오기
+                    response = await fetch(`http://localhost:8000/api/petitions?page=${currentPage}&size=${itemsPerPage}&category=${selectedCategory}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                }
+
                 if (!response.ok) {
                     throw new Error('네트워크 응답이 좋지 않습니다.');
                 }
+
                 const data = await response.json();
-                setPetitions(data.content);
-                setTotalPages(data.totalPages);
+                if (query) {
+                    setPetitions(data); // 검색 결과
+                    setTotalPages(Math.ceil(data.length / itemsPerPage));
+                } else {
+                    setPetitions(data.content); // 전체 청원 목록
+                    setTotalPages(data.totalPages);
+                }
             } catch (error) {
                 console.error('Error fetching petitions:', error);
                 setError('청원 데이터를 가져오는 데 실패했습니다.');
@@ -65,8 +88,8 @@ const AllPetitionsPage = () => {
             }
         };
 
-        fetchPetitions();
-    }, [currentPage, itemsPerPage, selectedCategory]);
+        fetchData(); // 데이터 가져오기 호출
+    }, [location.search, currentPage, itemsPerPage, selectedCategory]);
 
     const handleSearch = async (query) => {
         setSearchQuery(query);
@@ -103,7 +126,6 @@ const AllPetitionsPage = () => {
             const data = await response.json();
             setPetitions(data.content);
             setTotalPages(data.totalPages);
-            fetchPetitions();
         }
     };
 
