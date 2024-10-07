@@ -1,6 +1,7 @@
 package com.example.echo.domain.petition.controller;
 
 import com.example.echo.domain.member.entity.Member;
+import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.dto.request.InterestRequestDTO;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
 import com.example.echo.domain.petition.dto.response.InterestPetitionResponseDTO;
@@ -8,6 +9,7 @@ import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.service.PetitionService;
+import com.example.echo.global.security.auth.CustomUserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class PetitionController {
 
     private final PetitionService petitionService;
+    private final MemberRepository memberRepository;
 
     // 청원 등록
     @PreAuthorize("hasRole('ADMIN')")
@@ -151,9 +154,11 @@ public class PetitionController {
 
 
     // 나의 관심 목록 조회
-    @PreAuthorize("hasRole('USER')" )
+    @PreAuthorize("isAuthenticated()") // 메서드에 대한 접근을 인증된 사용자에게만 허용
     @GetMapping("/Myinterest")
-    public ResponseEntity<?> getInterestList(@AuthenticationPrincipal Member member) {
+    public ResponseEntity<?> getInterestList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+        Member member = memberRepository.findById(principal.getMemberId())
+                .orElseThrow(() -> new EntityNotFoundException("Member not found"));
         try {
             // 회원의 관심 목록 조회
             List<InterestPetitionResponseDTO> interestList = petitionService.getInterestList(member);
