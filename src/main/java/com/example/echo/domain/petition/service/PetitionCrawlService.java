@@ -42,14 +42,24 @@ public class PetitionCrawlService {
 
     private static final Logger logger = LoggerFactory.getLogger(PetitionCrawlService.class);
 
+    private WebDriver driver;
+    private WebDriverWait wait;
+
+    public PetitionCrawlService() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        this.driver = new ChromeDriver(options);
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+    }
+
     //title, href 이런 것들 따로 리스트에 저장한 뒤에
     //petition 다시 돌면서 href 같이 돌면서 들어가서 정보 가져오기
     public List<PetitionCrawl> dynamicCrawl(Long id, String url) {
         // 옵션 설정
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-
-        WebDriver driver = new ChromeDriver(options);
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--headless");
+//
+//        WebDriver driver = new ChromeDriver(options);
         StringBuilder result = new StringBuilder();
 
         // href 이용을 위한 초기 크롤링 데이터 저장
@@ -58,7 +68,7 @@ public class PetitionCrawlService {
             driver.get(url);
 
             int waitDuration = 30;
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(waitDuration));
+            wait = new WebDriverWait(driver, Duration.ofSeconds(waitDuration));
 
             // 마지막 페이지 무한 출력 해결을 위한 이전 제목들 저장
             List<String> previousTitles = new ArrayList<>();
@@ -263,4 +273,23 @@ public class PetitionCrawlService {
             logger.error("TimeoutException | NoSuchElementException while fetching: ", e);
         }
     }
+
+
+
+    // 동의자 수 업데이트
+    public int fetchAgreeCount(String url) {
+        driver.get(url); // 청원 url
+        // 동의자 수 추출
+        String agreeCountText = driver.findElement(By.cssSelector(".count")).getText();
+        String agreeCountNum = PetitionDataExtractor.extractNumber(agreeCountText);
+        return Integer.parseInt(agreeCountNum);
+    }
+
+    public void closeDriver() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+
 }

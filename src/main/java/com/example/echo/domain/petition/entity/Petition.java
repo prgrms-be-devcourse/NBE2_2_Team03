@@ -68,6 +68,9 @@ public class Petition {
     public void changeSummary(String summary) {
         this.summary = summary;
     }
+
+    public void changeAgreeCount(int agreeCount) {this.agreeCount = agreeCount;}
+
     @ElementCollection
     private Set<Long> likedMemberIds = new HashSet<>();
 
