@@ -93,6 +93,16 @@ const AllPetitionsPage = () => {
                 setIsLoading(false);
             }
         } else {
+            // 검색어가 없을 경우 원래 청원 목록으로 돌아가기
+            const response = await fetch(`http://localhost:8000/api/petitions?page=${currentPage}&size=${itemsPerPage}&category=${selectedCategory}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            setPetitions(data.content);
+            setTotalPages(data.totalPages);
             fetchPetitions();
         }
     };
