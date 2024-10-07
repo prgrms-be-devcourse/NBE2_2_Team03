@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
-import { Bell, LogOut, User } from "lucide-react";
-import ProfileModal from './ProfileModal.jsx'; // Import the ProfileModal component
-import '../css/Header.css'; // CSS 파일 임포트
+import { Bell, LogOut, Home } from "lucide-react"; // Home 아이콘 추가
+import ProfileModal from './ProfileModal.jsx';
+import '../css/Header.css';
 
 const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) => {
-    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false); // State to manage modal visibility
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
     const handleAvatarUpload = () => {
-        setIsProfileModalOpen(true); // Open the profile modal when avatar is clicked
-    };
-
-    const handleUpdate = (updatedUser) => {
-        setUser(updatedUser); // Update the user state with the new user data
-        setIsProfileModalOpen(false); // Close the modal after updating
+        setIsProfileModalOpen(true);
     };
 
     const handleLogout = () => {
-        setIsLoggedIn(false); // Set logged in state to false
-        setCurrentPage('home'); // Redirect to home page
+        setIsLoggedIn(false);
+        setCurrentPage('home');
     };
+
+    // user.avatar에서 파일명 추출하여 URL 생성
+    const avatarFileName = user.avatar ? user.avatar.split('/').pop() : null;
+
+    // 기본 아바타 이미지 URL 설정
+    const defaultAvatarUrl = 'http://localhost:8000/images/default-avatar.png';
+
+    // avatarUrl을 설정할 때, user.avatar가 유효한 경우에만 URL을 생성
+    const avatarUrl = avatarFileName && !user.avatar.includes('default-avatar.png')
+        ? `http://localhost:8000/${avatarFileName}`
+        : defaultAvatarUrl;
 
     return (
         <>
-            <header className="header bg-blue-600 text-white"> {/* 배경색과 텍스트 색상 설정 */}
+            <header className="header bg-blue-600 text-white">
                 <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                     <h1 className="text-2xl font-bold">국민동의청원 알리미</h1>
-                    <nav>
+                    <nav className="flex items-center">
                         <ul className="flex space-x-4 items-center">
                             <li>
-                                <button onClick={() => setCurrentPage('home')} className="hover:text-blue-200 text-white">홈</button>
+                                {/* 버튼 모양 없이 아이콘만 표시 */}
+                                <Home
+                                    className="w-6 h-6 hover:text-blue-200 cursor-pointer"
+                                    onClick={() => setCurrentPage('home')} // 클릭 시 홈 페이지로 이동
+                                />
                             </li>
                             <li>
                                 <button onClick={() => setCurrentPage('petitions')} className="hover:text-blue-200 text-white">전체 청원</button>
@@ -41,18 +51,24 @@ const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) =>
                                     <li>
                                         <Bell className="w-6 h-6 hover:text-blue-200 cursor-pointer text-white" />
                                     </li>
-                                    <li className="flex items-center cursor-pointer">
+                                    {/* 아바타 이미지와 사용자 이름 */}
+                                    <li className="flex items-center mr-4">
                                         <img
-                                            src={user.avatar}
+                                            src={avatarUrl} // 실제 아바타 이미지 URL
                                             alt="User Avatar"
-                                            className="w-8 h-8 rounded-full mr-2"
-                                            onClick={handleAvatarUpload} // Open the profile modal on avatar click
+                                            className="w-8 h-8 rounded-full border-2 border-gray-300 cursor-pointer mr-2"
+                                            onClick={() => window.open(avatarUrl, '_blank')} // 클릭 시 링크로 이동
                                         />
-                                        <User className="w-6 h-6 hover:text-blue-200 text-white" onClick={() => setCurrentPage('memberInfo')} />
+                                        <span
+                                            className="text-white cursor-pointer"
+                                            onClick={() => setCurrentPage('memberInfo')} // 사용자 이름 클릭 시 memberInfo 페이지로 이동
+                                        >
+                                            {user.name}
+                                        </span>
                                     </li>
                                     <li>
                                         <button
-                                            onClick={handleLogout} // Use the handleLogout function
+                                            onClick={handleLogout}
                                             className="flex items-center hover:text-blue-200 text-white"
                                         >
                                             <LogOut className="w-6 h-6 mr-1" />
@@ -73,8 +89,7 @@ const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) =>
             {isProfileModalOpen && (
                 <ProfileModal
                     user={user}
-                    onUpdate={handleUpdate}
-                    setIsProfileModalOpen={setIsProfileModalOpen} // Optional: if you want to close it from inside the modal
+                    setIsProfileModalOpen={setIsProfileModalOpen}
                 />
             )}
         </>

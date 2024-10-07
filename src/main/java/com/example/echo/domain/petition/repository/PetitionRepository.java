@@ -28,4 +28,7 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
     @Query("SELECT p FROM Petition p WHERE p.category = :category ORDER BY FUNCTION('RAND')")
     List<PetitionResponseDto> getCategoryPetitionsInRandomOrder(@Param("category") Category category, Pageable pageable);
 
+    // 제목에 검색어가 포함된 청원 조회 메서드 추가
+    List<Petition> findByTitleContainingIgnoreCase(String title);
+
 }
