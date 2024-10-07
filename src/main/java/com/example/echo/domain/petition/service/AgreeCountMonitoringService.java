@@ -29,8 +29,9 @@ public class AgreeCountMonitoringService {
                 // 현재 웹의 동의자 수
                 int currentAgreeCount = petitionCrawlService.fetchAgreeCount(petition.getOriginalUrl());
 
-                // 바뀌었으면 동의 수 변경하기
-                if (currentAgreeCount != petition.getAgreeCount()) {
+                // 동의 수 증가 시 변경
+                if (currentAgreeCount > petition.getAgreeCount()) {
+                    System.out.println("웹의 동의자 수 : " + currentAgreeCount + "\n" + "기존 동의 수"  + petition.getAgreeCount());
                     petition.changeAgreeCount(currentAgreeCount);
                     petitionRepository.save(petition);
                     System.out.println("동의 수 업데이트 청원 번호 : " + petition.getPetitionId());

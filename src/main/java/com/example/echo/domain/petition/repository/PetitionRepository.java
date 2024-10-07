@@ -31,4 +31,5 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
     // 제목에 검색어가 포함된 청원 조회 메서드 추가
     List<Petition> findByTitleContainingIgnoreCase(String title);
 
+
 }
