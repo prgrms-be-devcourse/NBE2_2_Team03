@@ -93,7 +93,7 @@ public class InquiryService {
     }
 
     // 문의ID와 멤버ID가 일치한지 확인
-    public boolean isInquiryOwer(Long inquiryId, Long memberId){
+    public boolean isInquiryOwner(Long inquiryId, Long memberId){
         Inquiry inquiry = findInquiryById(inquiryId);
 
         return inquiry.getMember().getMemberId().equals(memberId);

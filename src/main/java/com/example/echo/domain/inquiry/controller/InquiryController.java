@@ -53,7 +53,7 @@ public class InquiryController {
     }
 
     // 관리자와 회원이 1:1 문의 삭제
-    @PreAuthorize("hasRole('ADMIN') or @inquiryService.isInquiryOwer(#inquiryId,authentication.principal.memberId)")
+    @PreAuthorize("hasRole('ADMIN') or @inquiryService.isInquiryOwner(#inquiryId,authentication.principal.memberId)")
     @DeleteMapping("/{inquiryId}")
     public ResponseEntity<ApiResponse<Void>> deleteInquiry(@PathVariable Long inquiryId){
         inquiryService.deleteInquiry(inquiryId);
