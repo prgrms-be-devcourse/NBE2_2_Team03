@@ -73,7 +73,7 @@ public class JWTCheckFilter extends OncePerRequestFilter {
 
         // 청원 관련 GET 요청 중 /api/petitions/Myinterest를 제외한 모든 요청은 인증 제외
         if (requestURI.startsWith("/api/petitions") && "GET".equalsIgnoreCase(method)) {
-            return !requestURI.equals("/api/petitions/Myinterest");
+            return !requestURI.equals("/api/petitions/Myinterest"); // /api/petitions/Myinterest 경로일 경우 인증 요구 (false 반환)
         }
 
         return false;
