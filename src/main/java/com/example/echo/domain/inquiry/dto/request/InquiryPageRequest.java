@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InquiryPageRequestDTO {
+public class InquiryPageRequest {
 
     @NotNull(message = "페이지 번호는 필수입니다.")
     @Min(value = 1, message = "페이지 번호는 최소 1이어야 합니다.")
