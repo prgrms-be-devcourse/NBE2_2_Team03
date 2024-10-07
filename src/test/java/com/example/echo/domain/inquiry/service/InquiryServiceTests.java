@@ -1,8 +1,8 @@
 package com.example.echo.domain.inquiry.service;
 
-import com.example.echo.domain.inquiry.dto.request.InquiryPageRequestDTO;
-import com.example.echo.domain.inquiry.dto.request.InquiryRequestDTO;
-import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
+import com.example.echo.domain.inquiry.dto.request.InquiryPageRequest;
+import com.example.echo.domain.inquiry.dto.request.InquiryCreateRequest;
+import com.example.echo.domain.inquiry.dto.response.InquiryResponse;
 import com.example.echo.domain.inquiry.entity.InquiryCategory;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
@@ -26,14 +26,13 @@ class InquiryServiceTests {
     @Test
     @DisplayName("1:1 문의 생성")
     void testCreateInquiry() {
-        InquiryRequestDTO inquiryRequestDTO = InquiryRequestDTO.builder()
-                .memberId(1L)
+        InquiryCreateRequest inquiryRequest = InquiryCreateRequest.builder()
                 .inquiryCategory(InquiryCategory.MEMBER)
                 .inquiryTitle("문의제목11")
                 .inquiryContent("문의내용11")
                 .build();
 
-        InquiryResponseDTO createdInquiry = inquiryService.createInquiry(inquiryRequestDTO);
+        InquiryResponse createdInquiry = inquiryService.createInquiry(inquiryRequest, 1L);
 
         assertNotNull(createdInquiry);
         System.out.println(createdInquiry);
@@ -45,13 +44,13 @@ class InquiryServiceTests {
         Long inquiryId = 1L;
 
         // 정상 조회
-        InquiryResponseDTO foundInquiry = inquiryService.getInquiryById(inquiryId);
+        InquiryResponse foundInquiry = inquiryService.getInquiryById(inquiryId, 1L);
         assertNotNull(foundInquiry);
 
         // 예외 발생 테스트
         assertEquals("1:1 문의 정보를 찾을 수 없습니다.",
                 assertThrows(RuntimeException.class, () ->
-                        inquiryService.getInquiryById(100L)
+                        inquiryService.getInquiryById(100L, 1L)
                 ).getMessage()
         );
     }
@@ -70,10 +69,10 @@ class InquiryServiceTests {
                 .role(Role.ADMIN)
                 .build();
         memberRepository.save(member);
-        InquiryPageRequestDTO inquiryPageRequestDTO = InquiryPageRequestDTO.builder().pageNumber(2).build();
+        InquiryPageRequest inquiryPageRequest = InquiryPageRequest.builder().pageNumber(2).build();
 
-        Page<InquiryResponseDTO> inquiriesAdmin =
-                inquiryService.getInquiriesByMemberRole(member.getMemberId(), inquiryPageRequestDTO);
+        Page<InquiryResponse> inquiriesAdmin =
+                inquiryService.getInquiriesByMemberRole(inquiryPageRequest, member.getMemberId());
 
         assertNotNull(inquiriesAdmin);
         assertEquals(8, inquiriesAdmin.getTotalElements());
@@ -88,10 +87,10 @@ class InquiryServiceTests {
     void testFindAllForUser() throws Exception {
         // 2페이지 5사이즈 조회. DB엔 memberId = 1로 문의 데이터 총 7개 존재.
         Long memberId = 1L;
-        InquiryPageRequestDTO inquiryPageRequestDTO = InquiryPageRequestDTO.builder().pageNumber(2).build();
+        InquiryPageRequest inquiryPageRequest = InquiryPageRequest.builder().pageNumber(2).build();
 
-        Page<InquiryResponseDTO> inquiriesUser =
-                inquiryService.getInquiriesByMemberRole(memberId, inquiryPageRequestDTO);
+        Page<InquiryResponse> inquiriesUser =
+                inquiryService.getInquiriesByMemberRole(inquiryPageRequest, memberId);
 
         assertNotNull(inquiriesUser);
         assertEquals(7, inquiriesUser.getTotalElements());

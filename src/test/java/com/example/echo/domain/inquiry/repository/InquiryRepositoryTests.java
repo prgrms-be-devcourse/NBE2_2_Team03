@@ -1,6 +1,6 @@
 package com.example.echo.domain.inquiry.repository;
 
-import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
+import com.example.echo.domain.inquiry.dto.response.InquiryResponse;
 import com.example.echo.domain.inquiry.entity.Inquiry;
 import com.example.echo.domain.inquiry.entity.InquiryCategory;
 import com.example.echo.domain.member.entity.Member;
@@ -78,7 +78,7 @@ class InquiryRepositoryTests {
         // 1페이지 5사이즈 조회. DB엔 문의 데이터 총 8개 존재.
         Pageable pageable = PageRequest.of(1, 5, Sort.by("inquiryId").descending());
 
-        Page<InquiryResponseDTO> inquiriesAdmin = inquiryRepository.findAllInquiriesAdmin(pageable);
+        Page<InquiryResponse> inquiriesAdmin = inquiryRepository.findAllInquiriesAdmin(pageable);
 
         assertNotNull(inquiriesAdmin);
         assertEquals(8, inquiriesAdmin.getTotalElements());
@@ -95,7 +95,7 @@ class InquiryRepositoryTests {
         Long memberId = 1L;
         Pageable pageable = PageRequest.of(1, 5, Sort.by("inquiryId").descending());
 
-        Page<InquiryResponseDTO> inquiriesUser = inquiryRepository.findAllInquiriesUser(memberId, pageable);
+        Page<InquiryResponse> inquiriesUser = inquiryRepository.findAllInquiriesUser(memberId, pageable);
 
         assertNotNull(inquiriesUser);
         assertEquals(7, inquiriesUser.getTotalElements());
