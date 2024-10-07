@@ -15,7 +15,7 @@ import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import com.example.echo.global.exception.ErrorCode;
 import com.example.echo.global.exception.PetitionCustomException;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -82,6 +82,11 @@ public class PetitionService {
     // 청원 전체 조회
     public Page<PetitionResponseDto> getPetitions(Pageable pageable) {
         return petitionRepository.findAll(pageable).map(PetitionResponseDto::new);
+    }
+
+    // 진행 중인 청원 전체 조회
+    public Page<PetitionResponseDto> getOngoingPetitions(Pageable pageable) {
+        return petitionRepository.findAllOngoing(pageable).map(PetitionResponseDto::new);
     }
 
     // 청원 전체 조회 (카테고리별)
