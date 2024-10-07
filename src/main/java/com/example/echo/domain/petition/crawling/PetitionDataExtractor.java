@@ -1,4 +1,4 @@
-package com.example.echo.domain.petition.entity.crawling;
+package com.example.echo.domain.petition.crawling;
 
 import com.example.echo.domain.petition.entity.Category;
 import java.time.LocalDate;

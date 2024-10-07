@@ -4,9 +4,11 @@ import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
-import com.example.echo.domain.petition.entity.crawling.PetitionCrawl;
-import com.example.echo.domain.petition.entity.crawling.PetitionDataExtractor;
+import com.example.echo.domain.petition.crawling.PetitionCrawl;
+import com.example.echo.domain.petition.crawling.PetitionDataExtractor;
 import com.example.echo.domain.petition.repository.PetitionRepository;
+import com.example.echo.global.exception.ErrorCode;
+import com.example.echo.global.exception.PetitionCustomException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -111,7 +113,7 @@ public class PetitionCrawlService {
 
                     } catch (Exception e) {
                         System.out.println(countPetition);
-                        System.out.println("error extracting data : " + e.getMessage());
+                        logger.error("error extracting data : {}", e.getMessage());
                     }
 
                 }
@@ -140,7 +142,7 @@ public class PetitionCrawlService {
                 try {
                     fetchPetitionDetails(driver, wait, eachData);
                 } catch (StaleElementReferenceException e) {
-                    log.error("Stale element reference. Retrying petition details fetching for {}", eachData.getHref());
+                    logger.error("Stale element reference. Retrying petition details fetching for {}", eachData.getHref());
                     fetchPetitionDetails(driver, wait, eachData);
                 }
 
@@ -162,7 +164,7 @@ public class PetitionCrawlService {
                 log.info("content={}", content);
 
                 Member member = memberRepository.findById(id)
-                        .orElseThrow(()-> new RuntimeException("회원정보를 찾을수 없습니다."));
+                        .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
                 Petition petitionSave = Petition.builder()
                         .member(member)
@@ -264,28 +266,27 @@ public class PetitionCrawlService {
                 String content = contentElement.getText();
                 petitionCrawl.changeContent(content);
             }
-        } catch (TimeoutException | NoSuchElementException e) {
-            logger.error("TimeoutException | NoSuchElementException while fetching: ", e);
+        } catch (TimeoutException e) {
+            logger.error("TimeoutException : ", e);
+            throw new PetitionCustomException(ErrorCode.SELENIUM_TIMEOUT);
+        } catch (NoSuchElementException e) {
+            logger.error("NoSuchElementException while paging : ", e);
+            throw new PetitionCustomException(ErrorCode.SELENIUM_NO_ELEMENT_FOUND);
+        } catch (Exception e) {
+            logger.error("An error occurred: ", e);
+            throw new PetitionCustomException(ErrorCode.SELENIUM_UNKNOWN_ERROR);
         }
     }
-
 
 
     // 동의자 수 업데이트
     public int fetchAgreeCount(String url) {
         driver.get(url); // 청원 url
-        // 현재 웹의 동의 수가 0으로 나오는 경우 발생. wait 이용 대기
         wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
         // 동의자 수 추출
         String agreeCountText = driver.findElement(By.cssSelector(".count")).getText();
         String agreeCountNum = PetitionDataExtractor.extractNumber(agreeCountText);
         return Integer.parseInt(agreeCountNum);
-    }
-
-    public void closeDriver() {
-        if (driver != null) {
-            driver.quit();
-        }
     }
 
 

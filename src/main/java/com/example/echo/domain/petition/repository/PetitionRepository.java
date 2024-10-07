@@ -33,4 +33,5 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
 
     @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_DATE")
     Page<Petition> findAllOngoing(Pageable pageable);
+
 }
