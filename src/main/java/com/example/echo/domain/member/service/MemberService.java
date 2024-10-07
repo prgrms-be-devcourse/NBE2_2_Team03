@@ -8,7 +8,9 @@ import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
 import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
+import com.example.echo.global.exception.ErrorCode;
 import com.example.echo.global.exception.MemberNotFoundException;
+import com.example.echo.global.exception.PetitionCustomException;
 import com.example.echo.global.security.util.JWTUtil;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
@@ -104,20 +106,20 @@ public class MemberService {
     // userID로 회원 조회
     private Member findMemberByUserId(String userId) {
         return memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new MemberNotFoundException("해당 ID의 회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     // password 검증
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new MemberNotFoundException("비밀번호가 일치하지 않습니다.");
+            throw new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
 
     // 공통 메서드: 회원 ID로 회원 조회
     public Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     // JWT 토큰 생성

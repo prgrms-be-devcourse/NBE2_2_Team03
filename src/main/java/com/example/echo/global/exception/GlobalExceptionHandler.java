@@ -3,10 +3,10 @@ package com.example.echo.global.exception;
 import com.example.echo.global.api.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MemberNotFoundException.class)
@@ -19,5 +19,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleGeneralException(Exception ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("서버 오류가 발생했습니다."));
+    }
+
+
+    @ExceptionHandler(PetitionCustomException.class)
+    public ResponseEntity<ErrorResponse> handleArgsException(PetitionCustomException e) {
+        ErrorResponse response = ErrorResponse.from(e.getErrorCode().getHttpStatus(), e.getMessage());
+        return ResponseEntity.status(response.getHttpStatus()).body(response);
     }
 }

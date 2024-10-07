@@ -38,11 +38,11 @@ public class SummarizationService {
         body.put("model", "gpt-3.5-turbo");
 
         List<Map<String, Object>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "user", "content", "다음 텍스트를 요약해 주세요: " + text));
+        messages.add(Map.of("role", "user", "content", "다음 국민청원을 요약하고 주요 포인트를 포함해 주세요: " + text));
 
         // body.put("prompt", "다음 텍스트를 요약해 주세요: " + text);
         body.put("messages", messages);
-        body.put("max_tokens", 200);
+        body.put("max_tokens", 300);
         body.put("temperature", 0.3); // 높을 수록 유연
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers); // body, headers 하나로 만들기
