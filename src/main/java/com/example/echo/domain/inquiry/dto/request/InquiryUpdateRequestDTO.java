@@ -3,9 +3,10 @@ package com.example.echo.domain.inquiry.dto.request;
 import com.example.echo.domain.inquiry.entity.Inquiry;
 import com.example.echo.domain.inquiry.entity.InquiryCategory;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+
+@Data
 @Builder
 public class InquiryUpdateRequestDTO {
     private InquiryCategory inquiryCategory;
