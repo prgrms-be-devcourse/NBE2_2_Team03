@@ -147,7 +147,7 @@ const MemberInfoPage = ({ user, setUser }) => {
     const defaultAvatarUrl = 'http://localhost:8000/images/default-avatar.png';
 
     // URL 생성: user.avatar가 없을 경우 기본 이미지 사용
-    const avatarUrl = avatarImagePath ? `http://localhost:8000${avatarImagePath}` : defaultAvatarUrl;
+    const avatarUrl = avatarImagePath ? `http://localhost:8000/${avatarFileName}` : defaultAvatarUrl;
 
     return (
         <div className="p-6">
@@ -161,7 +161,8 @@ const MemberInfoPage = ({ user, setUser }) => {
                 <p className="text-gray-700"><strong>전화번호:</strong> {memberInfo.phone}</p>
                 <p className="text-gray-700"><strong>역할:</strong> {user.role}</p>
                 <div className="flex items-center mt-4">
-                    <a href={avatarUrl} target="_blank" rel="noopener noreferrer">
+                    <a href={avatarUrl} target="_blank" rel="noopener noreferrer"
+                       onClick={() => console.log("Clicked avatar URL:", avatarUrl)}>
                         <img
                             src={avatarUrl} // URL이 없으면 기본 이미지 사용
                             alt="User Avatar"
