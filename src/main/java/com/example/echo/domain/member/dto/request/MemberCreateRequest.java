@@ -23,7 +23,7 @@ public class MemberCreateRequest {
         member.setEmail(this.email);
         member.setPassword(this.password);
         member.setPhone(this.phone);
-        member.setAvatarImage(this.avatarImage != null ? this.avatarImage : "/images/avatar-default.png");
+        member.setAvatarImage(this.avatarImage != null ? this.avatarImage : "/images/default-avatar.png");
         member.setRole(this.role);
         return member;
     }

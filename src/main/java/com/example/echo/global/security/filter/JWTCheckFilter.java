@@ -29,6 +29,11 @@ public class JWTCheckFilter extends OncePerRequestFilter {
     // 필터링 적용하지 않을 URI 체크
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+
+        if(!request.getRequestURI().startsWith("/api/")){ //이미지 경로를 제외하기 위해 api로 시작하지 않는 경로도 제외
+            return true;
+        }
+
         return isAuthExcludedPath(request); // 토큰 발급 경로는 제외
     }
 

@@ -1,5 +1,6 @@
 package com.example.echo.domain.member.service;
 
+import com.example.echo.domain.member.dto.MemberDto;
 import com.example.echo.domain.member.dto.request.MemberCreateRequest;
 import com.example.echo.domain.member.dto.request.MemberLoginRequest;
 import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
@@ -7,10 +8,13 @@ import com.example.echo.domain.member.dto.request.ProfileImageUpdateRequest;
 import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
+import com.example.echo.global.exception.ErrorCode;
 import com.example.echo.global.exception.MemberNotFoundException;
+import com.example.echo.global.exception.PetitionCustomException;
 import com.example.echo.global.security.util.JWTUtil;
 import com.example.echo.global.util.UploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,11 +64,21 @@ public class MemberService {
     @Transactional
     public MemberResponse updateMember(Long memberId, MemberUpdateRequest memberRequest) {
         Member member = findMemberById(memberId);
-        checkUserIdDuplicate(memberRequest.getUserId());
-        checkEmailDuplicate(memberRequest.getEmail());
 
+        // 이메일 중복 확인 (이메일이 변경되었을 때만 확인)
+        if (!member.getEmail().equals(memberRequest.getEmail())) {
+            checkEmailDuplicate(memberRequest.getEmail());
+        }
+
+        // 전화번호 중복 확인 (전화번호가 변경되었을 때만 확인)
+        if (!member.getPhone().equals(memberRequest.getPhone())) {
+            checkPhoneDuplicate(memberRequest.getPhone());
+        }
+
+        // MemberUpdateRequest를 사용하여 업데이트
         memberRequest.updateMember(member);
-        return MemberResponse.from(memberRepository.save(member));
+
+        return MemberResponse.from(memberRepository.save(member)); // 수정된 회원 정보 저장
     }
 
     // 회원 삭제
@@ -92,20 +106,20 @@ public class MemberService {
     // userID로 회원 조회
     private Member findMemberByUserId(String userId) {
         return memberRepository.findByUserId(userId)
-                .orElseThrow(() -> new MemberNotFoundException("해당 ID의 회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     // password 검증
     private void validatePassword(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-            throw new MemberNotFoundException("비밀번호가 일치하지 않습니다.");
+            throw new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND);
         }
     }
 
     // 공통 메서드: 회원 ID로 회원 조회
     public Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("회원정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     // JWT 토큰 생성
@@ -130,5 +144,19 @@ public class MemberService {
         if (memberRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
         }
+    }
+
+    // 전화번호 중복 확인
+    private void checkPhoneDuplicate(String phone) {
+        if (memberRepository.findByPhone(phone).isPresent()) {
+            throw new RuntimeException("이미 존재하는 전화번호입니다.");
+        }
+    }
+
+    // 보호된 데이터 요청 시 사용자 정보 조회
+    public MemberDto getMemberInfo(Authentication authentication) {
+        String userId = authentication.getName(); // 인증된 사용자 ID 가져오기
+        Member member = findMemberByUserId(userId); // 사용자 정보를 DB에서 조회
+        return MemberDto.of(member); // MemberDto로 변환하여 반환
     }
 }

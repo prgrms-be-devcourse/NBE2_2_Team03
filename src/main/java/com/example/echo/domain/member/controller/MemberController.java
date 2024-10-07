@@ -14,9 +14,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,5 +104,16 @@ public class MemberController {
         MemberResponse responseDto = memberService.updateAvatar(memberId, requestDto);
         return ResponseEntity.ok(ApiResponse.success(responseDto));
     }
+
+    // 보호된 데이터 요청
+    @GetMapping("/protected-data")
+    public ResponseEntity<ApiResponse<MemberDto>> getProtectedData(Authentication authentication) {
+        // DB에서 회원 정보 조회
+        MemberDto memberDto = memberService.getMemberInfo(authentication);
+
+        return ResponseEntity.ok(ApiResponse.success(memberDto)); // MemberDto를 클라이언트에 반환
+    }
+
+
 }
 
