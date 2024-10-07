@@ -167,6 +167,4 @@ class MemberServiceTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.avatarImage").isNotEmpty());
     }
-
-
 }

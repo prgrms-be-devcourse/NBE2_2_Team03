@@ -7,7 +7,7 @@ import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.entity.Role;
 import com.example.echo.domain.member.repository.MemberRepository;
-import com.example.echo.global.exception.MemberNotFoundException;
+import com.example.echo.global.exception.PetitionCustomException;
 import com.example.echo.global.util.UploadUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +47,7 @@ class MemberServiceUnitTests {
         member.setUserId("testUser");
         member.setName("테스트 사용자");
         member.setEmail("test@example.com");
+        member.setPhone("010-1234-5678");
         member.setRole(Role.USER); // 기본 역할 설정
     }
 
@@ -97,11 +98,9 @@ class MemberServiceUnitTests {
         when(memberRepository.save(any(Member.class))).thenReturn(member); // 모의 저장 동작 설정
 
         MemberUpdateRequest updateRequest = MemberUpdateRequest.builder()
-                .userId("testUser")
                 .name("업데이트된 사용자")
                 .email("update@example.com")
                 .phone("010-9876-5432")
-                .avatarImage(null)
                 .role(Role.USER)
                 .build();
 
@@ -131,7 +130,7 @@ class MemberServiceUnitTests {
         when(memberRepository.findById(1L)).thenReturn(Optional.empty());
 
         // 예외 발생 검증
-        assertThrows(MemberNotFoundException.class, () -> memberService.getMember(1L));
+        assertThrows(PetitionCustomException.class, () -> memberService.getMember(1L));
     }
 
     // 프로필 사진 업데이트 테스트
