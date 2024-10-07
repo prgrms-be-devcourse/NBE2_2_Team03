@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Bell, LogOut, Home } from "lucide-react"; // Home 아이콘 추가
 import ProfileModal from './ProfileModal.jsx';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 추가
 import '../css/Header.css';
 
-const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) => {
+const Header = ({ isLoggedIn, setIsLoggedIn, user }) => {
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+    const navigate = useNavigate(); // useNavigate 훅 사용
 
     const handleAvatarUpload = () => {
         setIsProfileModalOpen(true);
@@ -12,7 +14,9 @@ const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) =>
 
     const handleLogout = () => {
         setIsLoggedIn(false);
-        setCurrentPage('home');
+        localStorage.removeItem('accessToken'); // 로그아웃 시 토큰 제거
+        localStorage.removeItem('refreshToken');
+        navigate('/login'); // 로그아웃 후 로그인 페이지로 이동
     };
 
     // user.avatar에서 파일명 추출하여 URL 생성
@@ -34,19 +38,18 @@ const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) =>
                     <nav className="flex items-center">
                         <ul className="flex space-x-4 items-center">
                             <li>
-                                {/* 버튼 모양 없이 아이콘만 표시 */}
                                 <Home
                                     className="w-6 h-6 hover:text-blue-200 cursor-pointer"
-                                    onClick={() => setCurrentPage('home')} // 클릭 시 홈 페이지로 이동
+                                    onClick={() => navigate('/home')} // 클릭 시 홈 페이지로 이동
                                 />
                             </li>
                             <li>
-                                <button onClick={() => setCurrentPage('petitions')} className="hover:text-blue-200 text-white">전체 청원</button>
+                                <button onClick={() => navigate('/petitions')} className="hover:text-blue-200 text-white">전체 청원</button>
                             </li>
                             {isLoggedIn ? (
                                 <>
                                     <li>
-                                        <button onClick={() => setCurrentPage('inquiries')} className="hover:text-blue-200 text-white">1:1 문의</button>
+                                        <button onClick={() => navigate('/inquiries')} className="hover:text-blue-200 text-white">1:1 문의</button>
                                     </li>
                                     <li>
                                         <Bell className="w-6 h-6 hover:text-blue-200 cursor-pointer text-white" />
@@ -61,7 +64,7 @@ const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) =>
                                         />
                                         <span
                                             className="text-white cursor-pointer"
-                                            onClick={() => setCurrentPage('memberInfo')} // 사용자 이름 클릭 시 memberInfo 페이지로 이동
+                                            onClick={() => navigate('/memberInfo')} // 사용자 이름 클릭 시 memberInfo 페이지로 이동
                                         >
                                             {user.name}
                                         </span>
@@ -78,7 +81,7 @@ const Header = ({ setCurrentPage, isLoggedIn, setIsLoggedIn, user, setUser }) =>
                                 </>
                             ) : (
                                 <li>
-                                    <button onClick={() => setCurrentPage('login')} className="hover:text-blue-200 text-white">로그인</button>
+                                    <button onClick={() => navigate('/login')} className="hover:text-blue-200 text-white">로그인</button>
                                 </li>
                             )}
                         </ul>

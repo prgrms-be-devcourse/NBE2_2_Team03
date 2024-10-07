@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const LoginPage = ({ setIsLoggedIn, setCurrentPage, setUser }) => {
+const LoginPage = ({ setIsLoggedIn, setUser }) => {
     const [userId, setUserId] = useState(''); // userId 상태 추가
     const [password, setPassword] = useState(''); // 비밀번호 상태 추가
     const [error, setError] = useState(''); // 에러 메시지 상태 추가
+    const navigate = useNavigate(); // useNavigate 훅 사용
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -27,7 +29,7 @@ const LoginPage = ({ setIsLoggedIn, setCurrentPage, setUser }) => {
 
             // 사용자 정보 요청이 완료된 후, 홈 페이지로 이동
             setIsLoggedIn(true);
-            setCurrentPage('home'); // 홈 페이지로 이동
+            navigate('/home'); // 홈 페이지로 이동
 
         } catch (err) {
             console.error("로그인 에러:", err.response?.data || err.message);
@@ -80,7 +82,7 @@ const LoginPage = ({ setIsLoggedIn, setCurrentPage, setUser }) => {
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">로그인</button>
                 <p className="mt-4 text-center text-gray-700">
                     계정이 없으신가요?
-                    <span onClick={() => setCurrentPage('signup')} className="text-blue-600 cursor-pointer">회원가입</span>
+                    <span onClick={() => navigate('/signup')} className="text-blue-600 cursor-pointer">회원가입</span>
                 </p>
             </form>
         </div>
