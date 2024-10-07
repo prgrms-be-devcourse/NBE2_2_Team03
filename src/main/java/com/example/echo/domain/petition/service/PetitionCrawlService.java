@@ -125,8 +125,8 @@ public class PetitionCrawlService {
                 String[] pageNumbers = fullText.split("/");
                 int currentPageNum = Integer.parseInt(pageNumbers[0].trim()); // "7"
                 int totalPagesNum = Integer.parseInt(pageNumbers[1].trim());
-                System.out.println("Current Page: " + currentPageNum);
-                System.out.println("Total Pages: " + totalPagesNum);
+                log.info("Current Page : {}", currentPageNum);
+                log.info("Total Pages : {}", totalPagesNum);
 
                 // 페이지 비교 통과면 다음 페이지로 넘기기
                 if (!navigateToNextPage(driver, wait, currentPageNum, totalPagesNum, petitionCards)) {
@@ -178,7 +178,7 @@ public class PetitionCrawlService {
                         .build();
                 petitionRepository.save( petitionSave );
 
-                System.out.println("Saved Petition: " + petitionSave.getTitle());
+                log.info("Saved Petition : {}", petitionSave.getTitle());
 ///////////////////////////
             }
 
@@ -224,7 +224,7 @@ public class PetitionCrawlService {
                         .map(card -> card.findElement(By.cssSelector(".desc")).getText())
                         .collect(Collectors.toList());
             } catch (StaleElementReferenceException e) {
-                System.out.println("new page desc found err");
+                logger.error("new page desc found err");
             }
             List<String> newTitles = newPetitionCards.stream()
                     .map(card -> card.findElement(By.cssSelector(".desc")).getText())
@@ -245,11 +245,10 @@ public class PetitionCrawlService {
 
         } catch (StaleElementReferenceException e) {
             logger.error("StaleElementReferenceException while paging: ", e);
-            System.out.println("Stale element on pagination, retrying...");
             return false;
         } catch (TimeoutException | NoSuchElementException e) {
             logger.error("TimeoutException | NoSuchElementException while paging : ", e);
-            System.out.println("No more pages or next button not found.");
+            log.info("No more pages or next button not found.");
             return false;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -284,9 +283,25 @@ public class PetitionCrawlService {
         driver.get(url); // 청원 url
         wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
         // 동의자 수 추출
-        String agreeCountText = driver.findElement(By.cssSelector(".count")).getText();
-        String agreeCountNum = PetitionDataExtractor.extractNumber(agreeCountText);
-        return Integer.parseInt(agreeCountNum);
+        int retries = 3;
+        while (retries-- > 0) {
+            try {
+                WebElement agreeCountElement = wait.until(
+                        ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".count")));
+                String agreeCountText = agreeCountElement.getText();
+                String agreeCountNum = PetitionDataExtractor.extractNumber(agreeCountText);
+                return Integer.parseInt(agreeCountNum);
+            } catch (TimeoutException e) {
+                logger.warn("Timeout while waiting for the agree count element. Retrying... Remaining attempts: {}",
+                        retries);
+            } catch (NoSuchElementException e) {
+                logger.error("NoSuchElementException: Unable to find the agree count element on URL: {}", url, e);
+                return -1;
+            }
+        }
+        logger.error("Failed to fetch agree count after multiple attempts for URL: {}", url);
+        return -1;
+
     }
 
 
