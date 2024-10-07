@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 
 const SignUpPage = () => {
     const [formData, setFormData] = useState({
+        userId: '',
+        name: '',
         email: '',
         password: '',
         phone: '',
-        // 추가 필드가 있다면 여기에 추가
+        role: 'USER', // 기본 역할 설정 (예: USER)
     });
 
     const handleChange = (e) => {
@@ -16,7 +18,7 @@ const SignUpPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         // 회원가입 API 호출
-        fetch('/api/signup', {
+        fetch('http://localhost:8000/api/members/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -33,8 +35,30 @@ const SignUpPage = () => {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-semibold mb-4 text-gray-800">회원가입</h1> {/* 텍스트 색상 변경 */}
+            <h1 className="text-2xl font-semibold mb-4 text-gray-800">회원가입</h1>
             <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+                <label className="block mb-2 text-gray-800">
+                    사용자 ID:
+                    <input
+                        type="text"
+                        name="userId"
+                        value={formData.userId}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+                        required
+                    />
+                </label>
+                <label className="block mb-2 text-gray-800">
+                    이름:
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+                        required
+                    />
+                </label>
                 <label className="block mb-2 text-gray-800">
                     이메일:
                     <input
@@ -42,7 +66,7 @@ const SignUpPage = () => {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black" // 흰색 배경에 검정색 텍스트
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
                         required
                     />
                 </label>
@@ -53,7 +77,7 @@ const SignUpPage = () => {
                         name="password"
                         value={formData.password}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black" // 흰색 배경에 검정색 텍스트
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
                         required
                     />
                 </label>
@@ -64,9 +88,21 @@ const SignUpPage = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black" // 흰색 배경에 검정색 텍스트
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
                         required
                     />
+                </label>
+                <label className="block mb-2 text-gray-800">
+                    역할:
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+                    >
+                        <option value="USER">사용자</option>
+                        <option value="ADMIN">관리자</option>
+                    </select>
                 </label>
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700">가입하기</button>
             </form>
