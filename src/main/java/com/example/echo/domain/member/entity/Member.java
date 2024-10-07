@@ -1,7 +1,6 @@
 package com.example.echo.domain.member.entity;
 
 import com.example.echo.domain.inquiry.entity.Inquiry;
-import com.example.echo.domain.interest.entity.Interest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -54,9 +53,10 @@ public class Member {
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
-    @OneToMany(mappedBy = "member")
-    @Builder.Default
-    private List<Interest> interestList = new ArrayList<>();    // 객체 생성 시 빈 리스트 초기화
+    @ElementCollection
+    @CollectionTable(name = "member_interests", joinColumns = @JoinColumn(name = "member_id"))
+    @Column(name = "petition_id")
+    private List<Long> interestList = new ArrayList<>();    // 객체 생성 시 빈 리스트 초기화
 
     // member 데이터를 삭제하려면 그 멤버와 관련된 inquiry 데이터를 먼저 처리해야 한다.
     // 데이터베이스에서 부모 테이블인 member 테이블의 데이터를 삭제하려 할 때,

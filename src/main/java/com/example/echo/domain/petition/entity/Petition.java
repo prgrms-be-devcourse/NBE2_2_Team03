@@ -12,6 +12,7 @@ import java.util.Set;
 @Table(name = "petition")
 @ToString
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -62,6 +63,7 @@ public class Petition {
 
     @Column(name = "agree_count")   // 청원 객체 생성 시점엔 동의자수 크롤링 데이터를 받아오지 않아 nullable = true 설정
     private Integer agreeCount;
+
 
     public void changeSummary(String summary) {
         this.summary = summary;

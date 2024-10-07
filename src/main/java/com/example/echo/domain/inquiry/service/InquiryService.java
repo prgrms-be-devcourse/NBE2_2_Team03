@@ -5,6 +5,7 @@ import com.example.echo.domain.inquiry.dto.request.InquiryRequestDTO;
 import com.example.echo.domain.inquiry.dto.request.InquiryUpdateRequestDTO;
 import com.example.echo.domain.inquiry.dto.response.InquiryResponseDTO;
 import com.example.echo.domain.inquiry.entity.Inquiry;
+import com.example.echo.domain.inquiry.entity.InquiryStatus;
 import com.example.echo.domain.inquiry.repository.InquiryRepository;
 import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -83,13 +86,14 @@ public class InquiryService {
     @Transactional
     public void addAnswer(Long inquiryId, String replyContent){
         Inquiry inquiry = findInquiryById(inquiryId);
-
+        inquiry.setInquiryStatus(InquiryStatus.RESOLVED);
+        inquiry.setRepliedDate(LocalDateTime.now());
         inquiry.changeReplyContent(replyContent);
         inquiryRepository.save(inquiry);
     }
 
     // 문의ID와 멤버ID가 일치한지 확인
-    public boolean isInquiryOwer(Long inquiryId, Long memberId){
+    public boolean isInquiryOwner(Long inquiryId, Long memberId){
         Inquiry inquiry = findInquiryById(inquiryId);
 
         return inquiry.getMember().getMemberId().equals(memberId);
