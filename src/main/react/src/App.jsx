@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import Header from './components/Header.jsx';
 import HomePage from './components/HomePage.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
 import InquiriesPage from './components/InquiriesPage.jsx';
 import AllPetitionsPage from './components/AllPetitionsPage.jsx';
+import PetitionDetailPage from './components/PetitionDetailPage.jsx';
 import LoginPage from './components/LoginPage.jsx';
 import SignUpPage from './components/SignUpPage.jsx';
 import MemberInfo from './components/MemberInfo.jsx';
@@ -46,31 +48,26 @@ const App = () => {
     }, []);
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
-            <Header
-                setCurrentPage={setCurrentPage}
-                isLoggedIn={isLoggedIn}
-                setIsLoggedIn={setIsLoggedIn}
-                user={user}
-                setIsProfileModalOpen={setIsProfileModalOpen}
-            />
-            <main className="flex-grow container mx-auto px-4 py-8">
-                {currentPage === 'home' && <HomePage petitions={petitions} />}
-                {currentPage === 'login' &&
-                    <LoginPage
-                        setIsLoggedIn={setIsLoggedIn}
-                        setCurrentPage={setCurrentPage}
-                        setUser={setUser}
-                    />}
-                {currentPage === 'inquiries' && isLoggedIn && <InquiriesPage inquiries={inquiries} setInquiries={setInquiries} />}
-                {currentPage === 'petitions' && <AllPetitionsPage petitions={petitions} />}
-                {currentPage === 'signup' && <SignUpPage />}
-                {currentPage === 'memberInfo' && (
-                    <MemberInfo
-                        user={user}
-                        setUser={setUser}
-                    />
-                )}
+        <Router>
+            <div className="min-h-screen flex flex-col bg-gray-100">
+                <Header
+                    isLoggedIn={isLoggedIn}
+                    setIsLoggedIn={setIsLoggedIn}
+                    user={user}
+                    setIsProfileModalOpen={setIsProfileModalOpen}
+                />
+                <main className="flex-grow container mx-auto px-4 py-8">
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/login" element={<LoginPage setIsLoggedIn={setIsLoggedIn} setUser={setUser} />} />
+                        <Route path="/signup" element={<SignUpPage />} />
+                        <Route path="/inquiries" element={isLoggedIn ? <InquiriesPage inquiries={inquiries} setInquiries={setInquiries} /> : <LoginPage setIsLoggedIn={setIsLoggedIn} setUser={setUser} />} />
+                        <Route path="/petitions" element={<AllPetitionsPage />} />
+                        <Route path="/petitions/:petitionId" element={<PetitionDetailPage />} /> {/* 추가 */}
+                        <Route path="/memberInfo" element={<MemberInfo user={user} setUser={setUser} />} />
+                    </Routes>
+                </main>
                 {isProfileModalOpen && (
                     <ProfileModal
                         user={user}
@@ -78,9 +75,9 @@ const App = () => {
                         setIsProfileModalOpen={setIsProfileModalOpen}
                     />
                 )}
-            </main>
-            <Footer />
-        </div>
+                <Footer />
+            </div>
+        </Router>
     );
 };
 
