@@ -14,6 +14,8 @@ public enum ErrorCode {
 
     // Member
     MEMBER_NOT_FOUND(NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
+    EMAIL_ALREADY_EXISTS(CONFLICT, "이미 존재하는 이메일입니다."),
+    PHONE_ALREADY_EXISTS(CONFLICT, "이미 존재하는 전화번호입니다."),
 
     // Petition
     PETITION_NOT_FOUND(NOT_FOUND, "청원을 찾을 수 없습니다."),

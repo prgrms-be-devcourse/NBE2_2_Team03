@@ -1,6 +1,5 @@
 package com.example.echo.domain.member.controller;
 
-import com.example.echo.domain.member.dto.MemberDto;
 import com.example.echo.domain.member.dto.request.MemberCreateRequest;
 import com.example.echo.domain.member.dto.request.MemberLoginRequest;
 import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
@@ -18,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,13 +31,13 @@ public class MemberController {
     // 로그인 API
     @Operation(summary = "회원 로그인", description = "회원이 로그인하여 JWT 토큰을 발급받습니다.")
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<Map<String, String>>> loginMember(@RequestBody MemberLoginRequest memberRequest) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> loginMember(@Valid @RequestBody MemberLoginRequest memberRequest) {
         Map<String, String> token = memberService.login(memberRequest);
         return ResponseEntity.ok(ApiResponse.success(token));
     }
 
     // 회원 등록
-    @Operation(summary = "회원 등록", description = " 신규 회원을 등록합니다.")
+    @Operation(summary = "회원 등록", description = "신규 회원을 등록합니다.")
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<MemberResponse>> createMember(@Valid @RequestBody MemberCreateRequest memberRequest) {
         MemberResponse createdMember = memberService.createMember(memberRequest);
@@ -51,8 +49,8 @@ public class MemberController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{memberId}")
     public ResponseEntity<ApiResponse<MemberResponse>> getMember(@PathVariable Long memberId) {
-        MemberResponse memberDto = memberService.getMember(memberId);
-        return ResponseEntity.ok(ApiResponse.success(memberDto));
+        MemberResponse foundMember = memberService.getMember(memberId);
+        return ResponseEntity.ok(ApiResponse.success(foundMember));
     }
 
     // 관리자 회원 전체 조회
@@ -68,7 +66,7 @@ public class MemberController {
     @Operation(summary = "회원 수정", description = "회원이 자신의 정보를 수정합니다.")
     @PreAuthorize("authentication.principal.memberId == #memberId")   // 해당 userId만 접근 가능
     @PutMapping("/{memberId}")
-    public ResponseEntity<ApiResponse<MemberResponse>> updateMember(@PathVariable Long memberId, @RequestBody MemberUpdateRequest memberRequest) {
+    public ResponseEntity<ApiResponse<MemberResponse>> updateMember(@PathVariable Long memberId, @Valid @RequestBody MemberUpdateRequest memberRequest) {
         MemberResponse updatedMember = memberService.updateMember(memberId, memberRequest);
         return ResponseEntity.ok(ApiResponse.success(updatedMember));
     }
@@ -107,13 +105,9 @@ public class MemberController {
 
     // 보호된 데이터 요청
     @GetMapping("/protected-data")
-    public ResponseEntity<ApiResponse<MemberDto>> getProtectedData(Authentication authentication) {
+    public ResponseEntity<ApiResponse<MemberResponse>> getProtectedData(Authentication authentication) {
         // DB에서 회원 정보 조회
-        MemberDto memberDto = memberService.getMemberInfo(authentication);
-
-        return ResponseEntity.ok(ApiResponse.success(memberDto)); // MemberDto를 클라이언트에 반환
+        MemberResponse foundMember = memberService.getMemberInfo(authentication);
+        return ResponseEntity.ok(ApiResponse.success(foundMember)); // MemberResponse를 클라이언트에 반환
     }
-
-
 }
-

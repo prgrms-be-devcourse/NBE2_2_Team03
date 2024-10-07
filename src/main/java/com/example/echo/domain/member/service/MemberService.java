@@ -1,6 +1,5 @@
 package com.example.echo.domain.member.service;
 
-import com.example.echo.domain.member.dto.MemberDto;
 import com.example.echo.domain.member.dto.request.MemberCreateRequest;
 import com.example.echo.domain.member.dto.request.MemberLoginRequest;
 import com.example.echo.domain.member.dto.request.MemberUpdateRequest;
@@ -9,7 +8,6 @@ import com.example.echo.domain.member.dto.response.MemberResponse;
 import com.example.echo.domain.member.entity.Member;
 import com.example.echo.domain.member.repository.MemberRepository;
 import com.example.echo.global.exception.ErrorCode;
-import com.example.echo.global.exception.MemberNotFoundException;
 import com.example.echo.global.exception.PetitionCustomException;
 import com.example.echo.global.security.util.JWTUtil;
 import com.example.echo.global.util.UploadUtil;
@@ -132,31 +130,24 @@ public class MemberService {
                 "refreshToken", refreshToken);
     }
 
-    // 유저 아이디 중복 확인
-    private void checkUserIdDuplicate(String userId) {
-        if (memberRepository.findByUserId(userId).isPresent()) {
-            throw new RuntimeException("이미 존재하는 아이디입니다.");
-        }
-    }
-
     // 이메일 중복 확인
     private void checkEmailDuplicate(String email) {
         if (memberRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("이미 존재하는 이메일입니다.");
+            throw new PetitionCustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
     }
 
     // 전화번호 중복 확인
     private void checkPhoneDuplicate(String phone) {
         if (memberRepository.findByPhone(phone).isPresent()) {
-            throw new RuntimeException("이미 존재하는 전화번호입니다.");
+            throw new PetitionCustomException(ErrorCode.PHONE_ALREADY_EXISTS);
         }
     }
 
     // 보호된 데이터 요청 시 사용자 정보 조회
-    public MemberDto getMemberInfo(Authentication authentication) {
+    public MemberResponse getMemberInfo(Authentication authentication) {
         String userId = authentication.getName(); // 인증된 사용자 ID 가져오기
         Member member = findMemberByUserId(userId); // 사용자 정보를 DB에서 조회
-        return MemberDto.of(member); // MemberDto로 변환하여 반환
+        return MemberResponse.from(member); // MemberResponse로 변환하여 반환
     }
 }
