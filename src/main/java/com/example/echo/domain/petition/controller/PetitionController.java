@@ -1,6 +1,9 @@
 package com.example.echo.domain.petition.controller;
 
+import com.example.echo.domain.member.entity.Member;
+import com.example.echo.domain.petition.dto.request.InterestRequestDTO;
 import com.example.echo.domain.petition.dto.request.PetitionRequestDto;
+import com.example.echo.domain.petition.dto.response.InterestPetitionResponseDTO;
 import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
