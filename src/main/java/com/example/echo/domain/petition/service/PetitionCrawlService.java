@@ -274,6 +274,8 @@ public class PetitionCrawlService {
     // 동의자 수 업데이트
     public int fetchAgreeCount(String url) {
         driver.get(url); // 청원 url
+        // 현재 웹의 동의 수가 0으로 나오는 경우 발생. wait 이용 대기
+        wait.until(webDriver -> ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
         // 동의자 수 추출
         String agreeCountText = driver.findElement(By.cssSelector(".count")).getText();
         String agreeCountNum = PetitionDataExtractor.extractNumber(agreeCountText);

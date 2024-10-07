@@ -13,24 +13,24 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PetitionRepository extends JpaRepository<Petition, Long> {
-    @Query("SELECT p FROM Petition p WHERE p.category = :category AND p.endDate >= CURRENT_TIMESTAMP")
+    @Query("SELECT p FROM Petition p WHERE p.category = :category AND p.endDate >= CURRENT_DATE")
     Page<Petition> findByCategory(Pageable pageable, Category category);
 
     @Query("SELECT p FROM Petition p WHERE p.originalUrl = :originalUrl")
     Optional<Petition> findByUrl(@Param("originalUrl") String originUrl);
 
-    @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_TIMESTAMP ORDER BY p.endDate ASC")
+    @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_DATE ORDER BY p.endDate ASC")
     List<PetitionResponseDto> getEndDatePetitions(Pageable pageable);
 
-    @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_TIMESTAMP ORDER BY p.likesCount DESC")
+    @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_DATE ORDER BY p.likesCount DESC")
     List<PetitionResponseDto> getLikesCountPetitions(Pageable pageable);
 
-    @Query("SELECT p FROM Petition p WHERE p.category = :category AND p.endDate >= CURRENT_TIMESTAMP ORDER BY FUNCTION('RAND')")
+    @Query("SELECT p FROM Petition p WHERE p.category = :category AND p.endDate >= CURRENT_DATE ORDER BY FUNCTION('RAND')")
     List<PetitionResponseDto> getCategoryPetitionsInRandomOrder(@Param("category") Category category, Pageable pageable);
 
     // 제목에 검색어가 포함된 청원 조회 메서드 추가
     List<Petition> findByTitleContainingIgnoreCase(String title);
 
-    @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_TIMESTAMP")
+    @Query("SELECT p FROM Petition p WHERE p.endDate >= CURRENT_DATE")
     Page<Petition> findAllOngoing(Pageable pageable);
 }
