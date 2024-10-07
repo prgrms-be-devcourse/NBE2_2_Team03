@@ -7,9 +7,12 @@ import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
+// import com.example.echo.global.exception.MemberNotFoundException;
 import com.example.echo.domain.petition.exception.MemberNotFoundException;
 import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
+import com.example.echo.global.exception.ErrorCode;
+import com.example.echo.global.exception.PetitionCustomException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +37,7 @@ public class PetitionService {
     public PetitionDetailResponseDto createPetition(PetitionRequestDto petitionDto) {
         // 청원 등록을 위한 관리자 아이디 검색
         Member member = memberRepository.findById(petitionDto.getMemberId())
-                .orElseThrow(() -> new MemberNotFoundException(petitionDto.getMemberId()));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Petition petition = petitionDto.toEntity(member);
         return new PetitionDetailResponseDto(petitionRepository.save(petition));
@@ -44,11 +47,11 @@ public class PetitionService {
     @Transactional // 요약 저장하는 경우 있음
     public PetitionDetailResponseDto getPetitionById(Long petitionId) {
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(()
-                -> new PetitionNotFoundException(petitionId)); // 청원 번호 조회 없으면 예외
+                -> new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND)); // 청원 번호 조회 없으면 예외
         // 청원 기간 만료 체크 -> 따로 서비스 층에 작성
         //  위에서 exception 발생 안함 = 청원이 존재한다는 뜻 -> 단순 날짜 비교만 진행
         if (isExpired(petition)) { // 만료되었으면 예외 발생
-            throw new PetitionNotFoundException(petitionId);
+            throw new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND);
         }
 
         String summary = petition.getSummary(); // 요약 내용 체크
@@ -102,10 +105,10 @@ public class PetitionService {
     @Transactional
     public PetitionDetailResponseDto updatePetition(Long petitionId, PetitionRequestDto updatedPetitionDto) {
         Petition existingPetition = petitionRepository.findById(petitionId)
-                .orElseThrow(() -> new PetitionNotFoundException(petitionId));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND));
 
         Member member = memberRepository.findById(updatedPetitionDto.getMemberId())
-                .orElseThrow(() -> new MemberNotFoundException(updatedPetitionDto.getMemberId()));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Petition updatedPetition = updatedPetitionDto.toEntityWithExistingData(existingPetition, member);
         return new PetitionDetailResponseDto(petitionRepository.save(updatedPetition));
