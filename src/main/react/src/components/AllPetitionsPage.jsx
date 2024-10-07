@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom'; // Link 추가
 import SearchBar from './SearchBar.jsx';
 
 const categories = [
@@ -200,7 +200,10 @@ const AllPetitionsPage = () => {
                 <ul>
                     {sortedPetitions().map((petition) => (
                         <li key={petition.petitionId} className="mb-4 p-4 bg-white rounded shadow">
-                            <h3 className="text-xl font-semibold text-gray-800">{petition.title}</h3>
+                            {/* 청원 제목을 클릭할 수 있도록 Link로 감싸기 */}
+                            <Link to={`/petitions/${petition.petitionId}`} className="text-xl font-semibold text-gray-800 hover:underline">
+                                {petition.title}
+                            </Link>
                             <p className="text-gray-600">시작일: {new Date(petition.startDate).toLocaleDateString()}</p>
                             <p className="text-gray-600">만료일: {new Date(petition.endDate).toLocaleDateString()}</p>
                             <p className="text-gray-600">카테고리: {petition.category}</p>
@@ -257,3 +260,4 @@ const AllPetitionsPage = () => {
 };
 
 export default AllPetitionsPage;
+
