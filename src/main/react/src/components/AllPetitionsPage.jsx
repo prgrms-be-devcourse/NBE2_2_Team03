@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import SearchBar from './SearchBar.jsx';
 
 const categories = [
     { value: "ALL", label: "전체" },
@@ -29,59 +30,56 @@ const sortOptions = [
     { value: 'EXPIRATION_DATE', label: '만료일' }
 ];
 
-const SearchBar = ({ onSearch }) => {
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const handleSearch = () => {
-        onSearch(searchTerm);
-    };
-
-    return (
-        <div className="relative mb-4">
-            <input
-                type="text"
-                placeholder="청원 검색..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                        handleSearch();
-                    }
-                }}
-                className="w-full p-4 pr-12 rounded-full border border-gray-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-            />
-            <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500" onClick={handleSearch} />
-        </div>
-    );
-};
-
 const AllPetitionsPage = () => {
+    const location = useLocation();
     const [petitions, setPetitions] = useState([]);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(0); // 페이지 0부터 시작
+    const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [itemsPerPage, setItemsPerPage] = useState(10); // 페이지당 아이템 수
-    const [selectedCategory, setSelectedCategory] = useState("ALL"); // 기본 카테고리
-    const [sortOrder, setSortOrder] = useState(sortOptions[0].value); // 기본 정렬 기준
-    const [searchQuery, setSearchQuery] = useState(''); // 검색어 상태
+    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [selectedCategory, setSelectedCategory] = useState("ALL");
+    const [sortOrder, setSortOrder] = useState(sortOptions[0].value);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        const fetchPetitions = async () => {
+        const fetchData = async () => {
+            const params = new URLSearchParams(location.search);
+            const query = params.get('query');
             setIsLoading(true);
             try {
-                const response = await fetch(`http://localhost:8000/api/petitions?page=${currentPage}&size=${itemsPerPage}&category=${selectedCategory}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                let response;
+                if (query) {
+                    setSearchQuery(query);
+                    // 검색 요청
+                    response = await fetch(`http://localhost:8000/api/petitions/search?query=${query}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                } else {
+                    // 검색어가 없을 경우 원래 청원 목록 가져오기
+                    response = await fetch(`http://localhost:8000/api/petitions?page=${currentPage}&size=${itemsPerPage}&category=${selectedCategory}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                }
+
                 if (!response.ok) {
                     throw new Error('네트워크 응답이 좋지 않습니다.');
                 }
+
                 const data = await response.json();
-                setPetitions(data.content); // 청원 내용 설정
-                setTotalPages(data.totalPages); // 전체 페이지 수 설정
+                if (query) {
+                    setPetitions(data); // 검색 결과
+                    setTotalPages(Math.ceil(data.length / itemsPerPage));
+                } else {
+                    setPetitions(data.content); // 전체 청원 목록
+                    setTotalPages(data.totalPages);
+                }
             } catch (error) {
                 console.error('Error fetching petitions:', error);
                 setError('청원 데이터를 가져오는 데 실패했습니다.');
@@ -90,13 +88,12 @@ const AllPetitionsPage = () => {
             }
         };
 
-        fetchPetitions();
-    }, [currentPage, itemsPerPage, selectedCategory]); // 필터와 정렬 기준 변경 시 데이터 재요청
+        fetchData(); // 데이터 가져오기 호출
+    }, [location.search, currentPage, itemsPerPage, selectedCategory]);
 
     const handleSearch = async (query) => {
         setSearchQuery(query);
-        setCurrentPage(0); // 검색 시 첫 페이지로 초기화
-
+        setCurrentPage(0);
         if (query) {
             setIsLoading(true);
             try {
@@ -110,8 +107,8 @@ const AllPetitionsPage = () => {
                     throw new Error('네트워크 응답이 좋지 않습니다.');
                 }
                 const data = await response.json();
-                setPetitions(data); // 검색된 청원 내용 설정
-                setTotalPages(Math.ceil(data.length / itemsPerPage)); // 전체 페이지 수 설정
+                setPetitions(data);
+                setTotalPages(Math.ceil(data.length / itemsPerPage));
             } catch (error) {
                 console.error('Error fetching petitions:', error);
                 setError('청원 검색에 실패했습니다.');
@@ -133,47 +130,44 @@ const AllPetitionsPage = () => {
     };
 
     const handlePageChange = (page) => {
-        if (page >= 0 && page < totalPages) { // 페이지 수가 0 이상, 전체 페이지 수 미만일 때만 변경
+        if (page >= 0 && page < totalPages) {
             setCurrentPage(page);
         }
     };
 
     const handleItemsPerPageChange = (event) => {
         setItemsPerPage(Number(event.target.value));
-        setCurrentPage(0); // 페이지 수가 변경되면 첫 페이지로 초기화
+        setCurrentPage(0);
     };
 
     const handleCategoryChange = (event) => {
         setSelectedCategory(event.target.value);
-        setCurrentPage(0); // 카테고리 변경 시 첫 페이지로 초기화
+        setCurrentPage(0);
     };
 
     const handleSortChange = (event) => {
         setSortOrder(event.target.value);
-        setCurrentPage(0); // 정렬 기준 변경 시 첫 페이지로 초기화
+        setCurrentPage(0);
     };
 
     const sortedPetitions = () => {
-        // 동의자 수로 정렬할 경우 기존 순서 유지
         if (sortOrder === 'AGREE_COUNT') {
-            return petitions; // 기존 순서 유지
+            return petitions;
         }
-
-        // 좋아요 수 또는 만료일로 정렬
         return [...petitions].sort((a, b) => {
             if (sortOrder === 'LIKES_COUNT') {
-                return b.likesCount - a.likesCount; // 내림차순 정렬
+                return b.likesCount - a.likesCount;
             } else if (sortOrder === 'EXPIRATION_DATE') {
-                return new Date(a.endDate) - new Date(b.endDate); // 오름차순 정렬
+                return new Date(a.endDate) - new Date(b.endDate);
             }
-            return 0; // 기본값
+            return 0;
         });
     };
 
     return (
         <div className="p-6">
             <h2 className="text-2xl font-semibold mb-4 text-gray-800">전체 청원</h2>
-            <SearchBar onSearch={handleSearch}/>
+            <SearchBar onSearch={handleSearch} />
             <div className="flex items-center mb-4">
                 <label htmlFor="category" className="mr-2 text-black">카테고리:</label>
                 <select
