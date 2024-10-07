@@ -14,13 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -60,6 +54,7 @@ public class PetitionCrawlService {
 //        options.addArguments("--headless");
 //
 //        WebDriver driver = new ChromeDriver(options);
+        driver.manage().window().setSize(new Dimension(390, 844)); // 크롤링 화면 크기 설정
         StringBuilder result = new StringBuilder();
 
         // href 이용을 위한 초기 크롤링 데이터 저장
