@@ -88,12 +88,11 @@ public class PetitionController {
     // 청원 좋아요 기능
     @PreAuthorize("authentication.principal.memberId == #memberId")
     @PostMapping("/{petitionId}/like")
-    public ResponseEntity<String> toggleLike(
+    public ResponseEntity<ApiResponse<String>> toggleLike(
             @PathVariable Long petitionId,
             @RequestParam(required = false) Long memberId) {
-         return petitionService.toggleLikeOnPetition(petitionId, memberId);
-//        String message = petitionService.toggleLikeOnPetition(petitionId, memberId);
-//        return ResponseEntity.ok(ApiResponse.success(message));
+        String message = petitionService.toggleLikeOnPetition(petitionId, memberId);
+        return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     // 청원 카테고리 선택 5개 조회
