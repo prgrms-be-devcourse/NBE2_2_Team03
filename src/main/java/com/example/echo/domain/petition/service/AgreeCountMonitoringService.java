@@ -3,6 +3,8 @@ package com.example.echo.domain.petition.service;
 import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -13,10 +13,17 @@ const PetitionDetailPage = () => {
         const fetchPetition = async () => {
             try {
                 const response = await axios.get(`http://localhost:8000/api/petitions/${petitionId}`);
-                setPetition(response.data);
+                const { success, data, message } = response.data; // ApiResponse 구조에 맞게 구조 분해
+
+                if (success) {
+                    setPetition(data); // 성공적으로 데이터 설정
+                } else {
+                    console.error('Error:', message); // 에러 처리
+                    setError(message); // 백엔드에서 받은 에러 메시지를 상태에 설정
+                }
             } catch (error) {
                 console.error('Error fetching petition:', error);
-                setError('청원 상세 데이터를 가져오는 데 실패했습니다.');
+                setError('청원 상세 데이터를 가져오는 데 실패했습니다.'); // 일반적인 에러 메시지 설정
             } finally {
                 setIsLoading(false);
             }
