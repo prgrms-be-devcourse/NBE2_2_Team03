@@ -103,7 +103,7 @@ public class PetitionService {
 
     // 좋아요 기능
     @Transactional
-    public ResponseEntity<String> toggleLikeOnPetition(Long petitionId, Long memberId) {
+    public String toggleLikeOnPetition(Long petitionId, Long memberId) {
         if (memberId == null) {
             throw new PetitionCustomException(ErrorCode.USER_NOT_MEMBER);
         }
@@ -125,7 +125,7 @@ public class PetitionService {
 
         // 좋아요가 추가되었는지 제거되었는지에 따라 적절한 메시지 반환
         String message = isLiked ? "좋아요가 추가되었습니다." : "좋아요가 제거되었습니다.";
-        return ResponseEntity.ok(message);
+        return message;
     }
 
     // 청원 카테고리 선택 5개 조회 (랜덤 순)

@@ -75,7 +75,7 @@ public class FileController {
             // UploadUtil 클래스의 deleteFile 메서드 호출
             uploadUtil.deleteFile(filename);
             log.info("파일이 성공적으로 삭제되었습니다: " + filename);
-            return ResponseEntity.ok(ApiResponse.success("파일이 성공적으로 삭제되었습니다."));
+            return ResponseEntity.ok(ApiResponse.success("파일이 성공적으로 삭제되었습니다.", null));
         } catch (Exception e) {
             log.error("파일 삭제 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
