@@ -127,7 +127,7 @@ public class PetitionController {
     //관심목록 추가
     @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @PostMapping("/interestAdd")
-    public ResponseEntity<?> addInterestt(@RequestBody InterestRequestDTO requestDTO) {
+    public ResponseEntity<?> addInterest(@RequestBody InterestRequestDTO requestDTO) {
         try {
             petitionService.addInterest(requestDTO);
             return ResponseEntity.ok("추가되었습니다.");
