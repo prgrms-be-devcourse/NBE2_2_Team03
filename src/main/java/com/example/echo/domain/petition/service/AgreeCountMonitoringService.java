@@ -3,6 +3,8 @@ package com.example.echo.domain.petition.service;
 import com.example.echo.domain.petition.entity.Petition;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,6 +18,7 @@ public class AgreeCountMonitoringService {
     private final PetitionRepository petitionRepository;
     private final PetitionCrawlService petitionCrawlService;
 
+    @Transactional
     @Scheduled(fixedRate = 600000) // 10분 마다 업데이트
     public void updateAgreeCountFromWeb() {
         List<Petition> petitions = petitionRepository.findAllActive(); // 만료 전만 가져오기
