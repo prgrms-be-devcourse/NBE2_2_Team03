@@ -1,6 +1,8 @@
-package com.example.echo.global.exception;
+package com.example.echo.global.advice;
 
 import com.example.echo.global.api.ApiResponse;
+import com.example.echo.global.exception.ErrorResponse;
+import com.example.echo.global.exception.PetitionCustomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

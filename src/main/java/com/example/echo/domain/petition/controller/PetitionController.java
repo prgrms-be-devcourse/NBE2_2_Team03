@@ -9,11 +9,13 @@ import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.service.PetitionService;
+import com.example.echo.global.api.ApiResponse;
+import com.example.echo.global.exception.ErrorCode;
+import com.example.echo.global.exception.PetitionCustomException;
 import com.example.echo.global.security.auth.CustomUserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/petitions")
@@ -36,54 +40,55 @@ public class PetitionController {
     @Operation(summary = "청원 등록", description = "새로운 청원을 등록합니다.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<PetitionDetailResponseDto> createPetition(
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> createPetition(
             @Parameter(description = "청원 등록 요청 정보", required = true) @RequestBody PetitionRequestDto petitionDto) {
         PetitionDetailResponseDto createdPetition = petitionService.createPetition(petitionDto);
-        return ResponseEntity.ok(createdPetition);
+        return ResponseEntity.ok(ApiResponse.success(createdPetition));
     }
 
     // 청원 단건 조회
     @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
     @GetMapping("/{petitionId}")
-    public ResponseEntity<PetitionDetailResponseDto> getPetitionById(
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> getPetitionById(
             @Parameter(description = "조회할 청원의 ID", required = true) @PathVariable Long petitionId) {
         PetitionDetailResponseDto petition = petitionService.getPetitionById(petitionId);
-        return ResponseEntity.ok(petition);
+        return ResponseEntity.ok(ApiResponse.success(petition));
     }
 
     // 청원 전체 조회
     @Operation(summary = "청원 전체 조회", description = "모든 청원을 페이지별로 조회합니다.")
     @GetMapping
-    public ResponseEntity<Page<PetitionResponseDto>> getPetitions(
+
+    public ResponseEntity<ApiResponse<Page<PetitionResponseDto>>> getPetitions(
             @Parameter(description = "청원 조회 페이징 요청 정보", required = true) Pageable pageable) {
         Page<PetitionResponseDto> petitions = petitionService.getOngoingPetitions(pageable);
-        return ResponseEntity.ok(petitions);
+        return ResponseEntity.ok(ApiResponse.success(petitions));
     }
 
     // 청원 카테고리별 조회
     @Operation(summary = "카테고리별 청원 조회", description = "특정 카테고리의 모든 청원을 페이지별로 조회합니다.")
     @GetMapping("/category/{category}")
-    public ResponseEntity<Page<PetitionResponseDto>> getPetitionsByCategory(
+    public ResponseEntity<ApiResponse<Page<PetitionResponseDto>>> getPetitionsByCategory(
             @Parameter(description = "조회할 청원의 카테고리", required = true) @PathVariable Category category,
             @Parameter(description = "청원 조회 페이징 요청 정보", required = true) Pageable pageable) {
         Page<PetitionResponseDto> petitions = petitionService.getPetitionsByCategory(pageable, category);
-        return ResponseEntity.ok(petitions);
+        return ResponseEntity.ok(ApiResponse.success(petitions));
     }
 
     // 청원 만료일 순 5개 조회
     @Operation(summary = "청원 만료일 기준 조회", description = "만료일이 가까운 청원 5개를 조회합니다.")
     @GetMapping("/view/endDate")
-    public ResponseEntity<List<PetitionResponseDto>> getEndDatePetitions() {
+    public ResponseEntity<ApiResponse<List<PetitionResponseDto>>> getEndDatePetitions() {
         List<PetitionResponseDto> endDatePetitions = petitionService.getEndDatePetitions();
-        return ResponseEntity.ok(endDatePetitions);
+        return ResponseEntity.ok(ApiResponse.success(endDatePetitions));
     }
 
     // 청원 좋아요 순 5개 조회
     @Operation(summary = "청원 좋아요 수 기준 조회", description = "좋아요 수가 많은 청원 5개를 조회합니다.")
     @GetMapping("/view/likesCount")
-    public ResponseEntity<List<PetitionResponseDto>> getLikesCountPetitions() {
+    public ResponseEntity<ApiResponse<List<PetitionResponseDto>>> getLikesCountPetitions() {
         List<PetitionResponseDto> likesCountPetitions = petitionService.getLikesCountPetitions();
-        return ResponseEntity.ok(likesCountPetitions);
+        return ResponseEntity.ok(ApiResponse.success(likesCountPetitions));
     }
 
     // 청원 좋아요 기능
@@ -99,30 +104,30 @@ public class PetitionController {
     // 청원 카테고리 선택 5개 조회
     @Operation(summary = "청원 카테고리별 조회", description = "특정 카테고리의 청원 5개를 랜덤으로 조회합니다.")
     @GetMapping("/view/category/{category}")
-    public ResponseEntity<List<PetitionResponseDto>> getRandomCategoryPetitions(
+    public ResponseEntity<ApiResponse<List<PetitionResponseDto>>> getRandomCategoryPetitions(
             @Parameter(description = "랜덤으로 조회할 청원의 카테고리", required = true) @PathVariable Category category) {
         List<PetitionResponseDto> categoryPetitions = petitionService.getRandomCategoryPetitions(category);
-        return ResponseEntity.ok(categoryPetitions);
+        return ResponseEntity.ok(ApiResponse.success(categoryPetitions));
     }
 
     // 제목으로 청원 검색
     @Operation(summary = "청원 제목으로 검색", description = "제목에 검색어가 포함된 청원을 조회합니다.")
     @GetMapping("/search")
-    public ResponseEntity<List<PetitionDetailResponseDto>> searchPetitions(
+    public ResponseEntity<ApiResponse<List<PetitionDetailResponseDto>>> searchPetitions(
             @Parameter(description = "검색할 제목의 키워드", required = true) @RequestParam String query) {
         List<PetitionDetailResponseDto> petitions = petitionService.searchPetitionsByTitle(query);
-        return ResponseEntity.ok(petitions);
+        return ResponseEntity.ok(ApiResponse.success(petitions));
     }
 
     // 청원 수정
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 수정", description = "특정 ID의 청원을 수정합니다.")
     @PutMapping("/{petitionId}")
-    public ResponseEntity<PetitionDetailResponseDto> updatePetition(
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> updatePetition(
             @Parameter(description = "수정할 청원의 ID", required = true) @PathVariable Long petitionId,
             @Parameter(description = "청원 수정 요청 정보", required = true) @RequestBody PetitionRequestDto petitionDto) {
         PetitionDetailResponseDto updatedPetition = petitionService.updatePetition(petitionId, petitionDto);
-        return ResponseEntity.ok(updatedPetition);
+        return ResponseEntity.ok(ApiResponse.success(updatedPetition));
     }
 
     // 청원 삭제
@@ -174,7 +179,7 @@ public class PetitionController {
     public ResponseEntity<?> getInterestList(
             @Parameter(description = "현재 인증된 사용자 정보", required = true) @AuthenticationPrincipal CustomUserPrincipal principal) {
         Member member = memberRepository.findById(principal.getMemberId())
-                .orElseThrow(() -> new EntityNotFoundException("회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
         try {
             // 회원의 관심 목록 조회
             List<InterestPetitionResponseDTO> interestList = petitionService.getInterestList(member);
