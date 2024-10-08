@@ -20,6 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -90,7 +91,9 @@ public class PetitionController {
     public ResponseEntity<String> toggleLike(
             @PathVariable Long petitionId,
             @RequestParam(required = false) Long memberId) {
-        return petitionService.toggleLikeOnPetition(petitionId, memberId);
+         return petitionService.toggleLikeOnPetition(petitionId, memberId);
+//        String message = petitionService.toggleLikeOnPetition(petitionId, memberId);
+//        return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     // 청원 카테고리 선택 5개 조회
@@ -122,36 +125,41 @@ public class PetitionController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 삭제", description = "특정 ID의 청원을 삭제합니다.")
     @DeleteMapping("/{petitionId}")
-    public ResponseEntity<Void> deletePetitionById(@PathVariable Long petitionId) {
+    public ResponseEntity<ApiResponse<Void>> deletePetitionById(@PathVariable Long petitionId) {
         petitionService.deletePetitionById(petitionId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                .body(ApiResponse.success(null));
     }
 
     //관심목록 추가
     @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @PostMapping("/interestAdd")
-    public ResponseEntity<?> addInterest(@RequestBody InterestRequestDTO requestDTO) {
+    public ResponseEntity<ApiResponse<?>> addInterest(@RequestBody InterestRequestDTO requestDTO) {
         try {
             petitionService.addInterest(requestDTO);
-            return ResponseEntity.ok("추가되었습니다.");
+            return ResponseEntity.ok(ApiResponse.success("추가되었습니다.", null));
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Entity not found"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("관심사 추가 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("관심사 추가 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 
     // 관심목록 제거
     @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @PostMapping("/interestRemove")
-    public ResponseEntity<?> removeInterest(@RequestBody InterestRequestDTO requestDTO) {
+    public ResponseEntity<ApiResponse<?>> removeInterest(@RequestBody InterestRequestDTO requestDTO) {
         try {
             petitionService.removeInterest(requestDTO);
-            return ResponseEntity.ok("관심사가 성공적으로 제거되었습니다.");
+            return ResponseEntity.ok(ApiResponse.success("관심사가 성공적으로 제거되었습니다.", null));
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("Entity not found"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("관심사 제거 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("관심사 제거 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 
@@ -159,26 +167,28 @@ public class PetitionController {
     // 나의 관심 목록 조회
     @PreAuthorize("isAuthenticated()") // 메서드에 대한 접근을 인증된 사용자에게만 허용
     @GetMapping("/Myinterest")
-    public ResponseEntity<?> getInterestList(@AuthenticationPrincipal CustomUserPrincipal principal) {
+    public ResponseEntity<ApiResponse<?>> getInterestList(@AuthenticationPrincipal CustomUserPrincipal principal) {
         Member member = memberRepository.findById(principal.getMemberId())
                 .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
         try {
             // 회원의 관심 목록 조회
             List<InterestPetitionResponseDTO> interestList = petitionService.getInterestList(member);
-            return ResponseEntity.ok(interestList);
+            return ResponseEntity.ok(ApiResponse.success(interestList));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("관심 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("관심 목록 조회 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 
     // 관심 목록 수에 따라 정렬
     @GetMapping("/interests")
-    public ResponseEntity<?> getPetitionsByInterestCount() {
+    public ResponseEntity<ApiResponse<?>> getPetitionsByInterestCount() {
         try {
             List<InterestPetitionResponseDTO> petitionList = petitionService.getPetitionsByInterestCount();
-            return ResponseEntity.ok(petitionList);
+            return ResponseEntity.ok(ApiResponse.success(petitionList));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("관심사 순위 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("관심사 순위 목록 조회 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 }
