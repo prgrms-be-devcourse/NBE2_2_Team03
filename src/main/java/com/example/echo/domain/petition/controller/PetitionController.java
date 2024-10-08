@@ -40,8 +40,7 @@ public class PetitionController {
     @Operation(summary = "청원 등록", description = "새로운 청원을 등록합니다.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> createPetition(@RequestBody PetitionRequestDto petitionDto) {
-    public ResponseEntity<PetitionDetailResponseDto> createPetition(
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> createPetition(
             @Parameter(description = "청원 등록 요청 정보", required = true) @RequestBody PetitionRequestDto petitionDto) {
         PetitionDetailResponseDto createdPetition = petitionService.createPetition(petitionDto);
         return ResponseEntity.ok(ApiResponse.success(createdPetition));
@@ -50,8 +49,7 @@ public class PetitionController {
     // 청원 단건 조회
     @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
     @GetMapping("/{petitionId}")
-    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> getPetitionById(@PathVariable Long petitionId) {
-    public ResponseEntity<PetitionDetailResponseDto> getPetitionById(
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> getPetitionById(
             @Parameter(description = "조회할 청원의 ID", required = true) @PathVariable Long petitionId) {
         PetitionDetailResponseDto petition = petitionService.getPetitionById(petitionId);
         return ResponseEntity.ok(ApiResponse.success(petition));
@@ -60,8 +58,7 @@ public class PetitionController {
     // 청원 전체 조회
     @Operation(summary = "청원 전체 조회", description = "모든 청원을 페이지별로 조회합니다.")
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<PetitionResponseDto>>> getPetitions(Pageable pageable) {
-    public ResponseEntity<Page<PetitionResponseDto>> getPetitions(
+    public ResponseEntity<ApiResponse<Page<PetitionResponseDto>>> getPetitions(
             @Parameter(description = "청원 조회 페이징 요청 정보", required = true) Pageable pageable) {
         Page<PetitionResponseDto> petitions = petitionService.getOngoingPetitions(pageable);
         return ResponseEntity.ok(ApiResponse.success(petitions));
@@ -70,9 +67,7 @@ public class PetitionController {
     // 청원 카테고리별 조회
     @Operation(summary = "카테고리별 청원 조회", description = "특정 카테고리의 모든 청원을 페이지별로 조회합니다.")
     @GetMapping("/category/{category}")
-    public ResponseEntity<ApiResponse<Page<PetitionResponseDto>>> getPetitionsByCategory(@PathVariable Category category,
-                                                                            Pageable pageable) {
-    public ResponseEntity<Page<PetitionResponseDto>> getPetitionsByCategory(
+    public ResponseEntity<ApiResponse<Page<PetitionResponseDto>>> getPetitionsByCategory(
             @Parameter(description = "조회할 청원의 카테고리", required = true) @PathVariable Category category,
             @Parameter(description = "청원 조회 페이징 요청 정보", required = true) Pageable pageable) {
         Page<PetitionResponseDto> petitions = petitionService.getPetitionsByCategory(pageable, category);
@@ -100,21 +95,16 @@ public class PetitionController {
     @Operation(summary = "청원 좋아요 토글", description = "청원에 좋아요를 추가하거나 제거합니다.")
     @PostMapping("/{petitionId}/like")
     public ResponseEntity<ApiResponse<String>> toggleLike(
-            @PathVariable Long petitionId,
-            @RequestParam(required = false) Long memberId) {
-        String message = petitionService.toggleLikeOnPetition(petitionId, memberId);
-        return ResponseEntity.ok(ApiResponse.success(message));
-    public ResponseEntity<String> toggleLike(
             @Parameter(description = "좋아요를 추가하거나 제거할 청원의 ID", required = true) @PathVariable Long petitionId,
             @Parameter(description = "좋아요를 클릭한 회원의 ID", required = true) @RequestParam(required = false) Long memberId) {
-        return petitionService.toggleLikeOnPetition(petitionId, memberId);
+        String message = petitionService.toggleLikeOnPetition(petitionId, memberId);
+        return ResponseEntity.ok(ApiResponse.success(message));
     }
 
     // 청원 카테고리 선택 5개 조회
     @Operation(summary = "청원 카테고리별 조회", description = "특정 카테고리의 청원 5개를 랜덤으로 조회합니다.")
     @GetMapping("/view/category/{category}")
-    public ResponseEntity<ApiResponse<List<PetitionResponseDto>>> getRandomCategoryPetitions(@PathVariable Category category) {
-    public ResponseEntity<List<PetitionResponseDto>> getRandomCategoryPetitions(
+    public ResponseEntity<ApiResponse<List<PetitionResponseDto>>> getRandomCategoryPetitions(
             @Parameter(description = "랜덤으로 조회할 청원의 카테고리", required = true) @PathVariable Category category) {
         List<PetitionResponseDto> categoryPetitions = petitionService.getRandomCategoryPetitions(category);
         return ResponseEntity.ok(ApiResponse.success(categoryPetitions));
@@ -123,8 +113,7 @@ public class PetitionController {
     // 제목으로 청원 검색
     @Operation(summary = "청원 제목으로 검색", description = "제목에 검색어가 포함된 청원을 조회합니다.")
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<PetitionDetailResponseDto>>> searchPetitions(@RequestParam String query) {
-    public ResponseEntity<List<PetitionDetailResponseDto>> searchPetitions(
+    public ResponseEntity<ApiResponse<List<PetitionDetailResponseDto>>> searchPetitions(
             @Parameter(description = "검색할 제목의 키워드", required = true) @RequestParam String query) {
         List<PetitionDetailResponseDto> petitions = petitionService.searchPetitionsByTitle(query);
         return ResponseEntity.ok(ApiResponse.success(petitions));
@@ -134,8 +123,7 @@ public class PetitionController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 수정", description = "특정 ID의 청원을 수정합니다.")
     @PutMapping("/{petitionId}")
-    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> updatePetition(@PathVariable Long petitionId, @RequestBody PetitionRequestDto petitionDto) {
-    public ResponseEntity<PetitionDetailResponseDto> updatePetition(
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> updatePetition(
             @Parameter(description = "수정할 청원의 ID", required = true) @PathVariable Long petitionId,
             @Parameter(description = "청원 수정 요청 정보", required = true) @RequestBody PetitionRequestDto petitionDto) {
         PetitionDetailResponseDto updatedPetition = petitionService.updatePetition(petitionId, petitionDto);
@@ -146,8 +134,7 @@ public class PetitionController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "청원 삭제", description = "특정 ID의 청원을 삭제합니다.")
     @DeleteMapping("/{petitionId}")
-    public ResponseEntity<ApiResponse<Void>> deletePetitionById(@PathVariable Long petitionId) {
-    public ResponseEntity<Void> deletePetitionById(
+    public ResponseEntity<ApiResponse<Void>> deletePetitionById(
             @Parameter(description = "삭제할 청원의 ID", required = true) @PathVariable Long petitionId) {
         petitionService.deletePetitionById(petitionId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
@@ -158,8 +145,7 @@ public class PetitionController {
     @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @Operation(summary = "관심 목록 추가", description = "청원을 관심 목록에 추가합니다.")
     @PostMapping("/interestAdd")
-    public ResponseEntity<ApiResponse<?>> addInterest(@RequestBody InterestRequestDTO requestDTO) {
-    public ResponseEntity<?> addInterest(
+    public ResponseEntity<ApiResponse<?>> addInterest(
             @Parameter(description = "관심 목록 추가 요청 정보", required = true) @RequestBody InterestRequestDTO requestDTO) {
         try {
             petitionService.addInterest(requestDTO);
@@ -177,8 +163,7 @@ public class PetitionController {
     @PreAuthorize("authentication.principal.memberId == #requestDTO.memberId")
     @Operation(summary = "관심 목록 제거", description = "청원을 관심 목록에서 제거합니다.")
     @PostMapping("/interestRemove")
-    public ResponseEntity<ApiResponse<?>> removeInterest(@RequestBody InterestRequestDTO requestDTO) {
-    public ResponseEntity<?> removeInterest(
+    public ResponseEntity<ApiResponse<?>> removeInterest(
             @Parameter(description = "관심 목록 추가 요청 정보", required = true) @RequestBody InterestRequestDTO requestDTO) {
         try {
             petitionService.removeInterest(requestDTO);
@@ -196,12 +181,10 @@ public class PetitionController {
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "내 관심 목록 조회", description = "현재 사용자의 관심 목록을 조회합니다.")
     @GetMapping("/Myinterest")
-    public ResponseEntity<ApiResponse<?>> getInterestList(@AuthenticationPrincipal CustomUserPrincipal principal) {
-    public ResponseEntity<?> getInterestList(
+    public ResponseEntity<ApiResponse<?>> getInterestList(
             @Parameter(description = "현재 인증된 사용자 정보", required = true) @AuthenticationPrincipal CustomUserPrincipal principal) {
         Member member = memberRepository.findById(principal.getMemberId())
                 .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
-                .orElseThrow(() -> new EntityNotFoundException("회원이 존재하지 않습니다."));
         try {
             // 회원의 관심 목록 조회
             List<InterestPetitionResponseDTO> interestList = petitionService.getInterestList(member);

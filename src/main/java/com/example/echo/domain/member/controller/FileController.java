@@ -29,8 +29,6 @@ public class FileController {
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<List<String>>> uploadFile(
             @Parameter(description = "업로드할 파일", required = true) @RequestParam("files") MultipartFile[] files) {
-    public ResponseEntity<ApiResponse<List<String>>> uploadFile(
-            @RequestParam("files") MultipartFile[] files) {
         log.info("--- uploadFile() invoked ---");
 
         // 업로드 파일이 없는 경우
@@ -69,7 +67,6 @@ public class FileController {
     // 파일 삭제
     @Operation(summary = "파일 삭제", description = "파일 이름으로 파일을 삭제합니다.")
     @DeleteMapping("/{filename}")
-    public ResponseEntity<ApiResponse<?>> fileDelete(@PathVariable String filename) {
     public ResponseEntity<ApiResponse<String>> fileDelete(
             @Parameter(description = "삭제할 파일 이름", required = true) @PathVariable String filename) {
         log.info("--- fileDelete() invoked for filename: " + filename);
@@ -79,7 +76,6 @@ public class FileController {
             uploadUtil.deleteFile(filename);
             log.info("파일이 성공적으로 삭제되었습니다: " + filename);
             return ResponseEntity.ok(ApiResponse.success("파일이 성공적으로 삭제되었습니다.", null));
-            return ResponseEntity.ok(ApiResponse.success("파일이 성공적으로 삭제되었습니다."));
         } catch (Exception e) {
             log.error("파일 삭제 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
