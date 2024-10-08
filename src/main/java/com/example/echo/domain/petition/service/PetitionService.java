@@ -106,8 +106,6 @@ public class PetitionService {
     public ResponseEntity<String> toggleLikeOnPetition(Long petitionId, Long memberId) {
         if (memberId == null) {
             throw new PetitionCustomException(ErrorCode.USER_NOT_MEMBER);
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body("비회원은 좋아요 기능을 사용할 수 없습니다.");
         }
 
         // 멤버 존재 여부 확인
