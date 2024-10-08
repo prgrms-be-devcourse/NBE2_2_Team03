@@ -1,2 +1,103 @@
-# NBE2_2_Team03
-국민동의 청원 알리미 서비스
+# 📢NBE2_2_Team03 (Echo)
+**국민의 정책 참여를 촉진하고 청원이 더 널리 퍼질 수 있도록 기여하고자 합니다!**
+
+<br>
+
+## 📝서비스 소개
+국민동의 청원 알리미"는 국민이 청원 정보를 보다 쉽게 접할 수 있도록 돕는 서비스입니다. 
+사용자는 **동의가 급증하거나 만료가 임박한 청원을 확인**하고, **AI 요약을 통해 청원의 핵심 내용을 간편하게 파악할 수 있습니다.** 
+
+또한, **좋아요 수가 많은 청원**을 통해 **대중의 관심이 집중된 청원**을 쉽게 찾을 수 있으며, 사용자는 관심 있는 청원을 **관심목록에 저장**하고, 관련 소식을 지속적으로 받아볼 수 있습니다.
+
+<br>
+
+## 🧾**개발 기간**
+
+2024/09/23 ~ 2024/10/10
+
+<br>
+
+## ✔주요기능
+
+- Chatgpt API를 이용한 청원 요약 안내
+- JWT 기반 인증 시스템
+- 청원 목록 조회
+- 관심 청원 목록 조회
+- 청원 관련 뉴스 제공
+- 청원 동의 수 및 관심도에 따른 추천
+- 청원 좋아요 수에 따른 추천
+- ...
+  
+<br>
+
+## 📁패키지 구조
+
+<details>
+  <summary>📦 패키지 구조 </summary>
+📦src
+ ┣ main<br/>
+ ┃ ┣ java<br/>
+ ┃ ┃ ┗ com<br/>
+ ┃ ┃ ┃ ┗ example<br/>
+ ┃ ┃ ┃ ┃ ┗ echo<br/>
+ ┃ ┃ ┃ ┃ ┃ ┣ domain<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ inquiry<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ controller<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ dto<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ request<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ response<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ entity<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ repository<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ interest<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ entity<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ member<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ controller<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ advice<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ dto<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ request<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ response<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ entity<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ repository<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┗ petition<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ controller<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ crawling<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ dto<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ request<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ response<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ entity<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ repository<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
+ ┃ ┃ ┃ ┃ ┃ ┣ global<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ api<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ config<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ exception<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ security<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ auth<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ filter<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ util<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┗ util<br/>
+ ┃ ┣ react<br/>
+ ┃ ┃ ┣ public<br/>
+ ┃ ┃ ┣ src<br/>
+ ┃ ┃ ┃ ┣ assets<br/>
+ ┃ ┃ ┃ ┣ components<br/>
+ ┃ ┃ ┃ ┣ css<br/>
+ ┃ ┗ resources<br/>
+ ┃ ┃ ┣ static<br/>
+ ┃ ┃ ┃ ┗ images<br/>
+ ┗ test<br/>
+ ┃ ┗ java<br/>
+ ┃ ┃ ┗ com<br/>
+ ┃ ┃ ┃ ┗ example<br/>
+ ┃ ┃ ┃ ┃ ┗ echo<br/>
+ ┃ ┃ ┃ ┃ ┃ ┣ domain<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ inquiry<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ repository<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┣ member<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┣ repository<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┗ petition<br/>
+ ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
