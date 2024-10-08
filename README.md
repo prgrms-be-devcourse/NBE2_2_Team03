@@ -3,6 +3,59 @@
 
 <br>
 
+## 😀팀원 소개
+<table>
+  <tr>
+    <td>
+        <a href="https://github.com/juchan204">
+            <img src="https://avatars.githubusercontent.com/u/127003137?v=4" width="100px" />
+        </a>
+    </td>
+    <td>
+        <a href="https://github.com/jooinjoo">
+            <img src="https://avatars.githubusercontent.com/u/177445328?v=4" width="100px" />
+        </a>
+    </td>
+    <td>
+        <a href="https://github.com/Song-min-geun">
+            <img src="https://avatars.githubusercontent.com/u/164311387?v=4" width="100px" />
+        </a>
+    </td>
+    <td>
+        <a href="https://github.com/kimdongjoon-web">
+            <img src="https://avatars.githubusercontent.com/u/176230828?v=4" width="100px" />
+        </a>
+    </td>
+    <td>
+        <a href="https://github.com/usernameme0w">
+            <img src="https://avatars.githubusercontent.com/u/163955522?v=4" width="100px" />
+        </a>
+    </td>
+    <td>
+        <a href="https://github.com/Wenpe77">
+            <img src="https://avatars.githubusercontent.com/u/105703574?v=4" width="100px" />
+        </a>
+    </td>
+  </tr>
+  <tr>
+    <td><b>이주찬</b></td>
+    <td><b>정원주</b></td>
+    <td><b>송민근</b></td>
+    <td><b>김동준</b></td>
+    <td><b>강수민</b></td>
+    <td><b>위성운</b></td>
+  </tr>
+  <tr>
+    <td><b>Backend,Frontend</b></td>
+    <td><b>Backend,Frontend</b></td>
+    <td><b>Backend</b></td>
+    <td><b>Backend</b></td>
+    <td><b>Backend</b></td>
+    <td><b>Backend</b></td>
+  </tr>
+</table>
+<br>
+
 ## 📝서비스 소개
 국민동의 청원 알리미"는 국민이 청원 정보를 보다 쉽게 접할 수 있도록 돕는 서비스입니다. 
 사용자는 **동의가 급증하거나 만료가 임박한 청원을 확인**하고, **AI 요약을 통해 청원의 핵심 내용을 간편하게 파악할 수 있습니다.** 
@@ -30,7 +83,21 @@
   
 <br>
 
-## 📁패키지 구조
+## 🛠 개발 환경
+
+| **구성 요소**        | **설명**                |
+|--------------------|------------------------|
+| **JDK**            | Java 17                |
+| **프레임워크**     | Spring Boot 2.x.x      |
+| **DB**             | MySQL                  |
+| **빌드 도구**      | Gradle                  |
+| **IDE**            | IntelliJ IDEA          |
+| **기술 및 라이브러리** | Lombok, JWT, React, Spring Security, Chatgpt API, JPA |
+| **협업 도구**      | Notion, GitHub, Slack  |
+<br>
+
+
+## 📁구조 토글
 
 <details>
   <summary>📦 패키지 구조 </summary>
@@ -102,3 +169,14 @@
  ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
  ┃ ┃ ┃ ┃ ┃ ┃ ┗ petition<br/>
  ┃ ┃ ┃ ┃ ┃ ┃ ┃ ┗ service<br/>
+</details>
+<details>
+  <summary>📦 ERD 구조 </summary>
+내용
+  </details>
+
+<br>
+
+## 🎞API 명세서
+
+<br>
