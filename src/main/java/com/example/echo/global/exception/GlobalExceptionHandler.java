@@ -19,6 +19,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PetitionCustomException.class)
     public ResponseEntity<ErrorResponse> handleArgsException(PetitionCustomException e) {
         ErrorResponse response = ErrorResponse.from(e.getErrorCode().getHttpStatus(), e.getMessage());
-        return ResponseEntity.status(response.getHttpStatus()).body(response);
+        return ResponseEntity.status(response.getHttpStatus())
+                .body(response);
     }
 }

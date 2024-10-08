@@ -9,9 +9,6 @@ import com.example.echo.domain.petition.dto.response.PetitionDetailResponseDto;
 import com.example.echo.domain.petition.dto.response.PetitionResponseDto;
 import com.example.echo.domain.petition.entity.Category;
 import com.example.echo.domain.petition.entity.Petition;
-// import com.example.echo.global.exception.MemberNotFoundException;
-import com.example.echo.domain.petition.exception.MemberNotFoundException;
-import com.example.echo.domain.petition.exception.PetitionNotFoundException;
 import com.example.echo.domain.petition.repository.PetitionRepository;
 import com.example.echo.global.exception.ErrorCode;
 import com.example.echo.global.exception.PetitionCustomException;
@@ -19,13 +16,11 @@ import com.example.echo.global.exception.PetitionCustomException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,18 +105,19 @@ public class PetitionService {
     @Transactional
     public ResponseEntity<String> toggleLikeOnPetition(Long petitionId, Long memberId) {
         if (memberId == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("비회원은 좋아요 기능을 사용할 수 없습니다.");
+            throw new PetitionCustomException(ErrorCode.USER_NOT_MEMBER);
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body("비회원은 좋아요 기능을 사용할 수 없습니다.");
         }
 
         // 멤버 존재 여부 확인
         if (!memberRepository.existsById(memberId)) {
-            throw new MemberNotFoundException(memberId); // 여기에서 발생시키는 예외
+            throw new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND); // 여기에서 발생시키는 예외
         }
 
         // 청원 조회
         Petition petition = petitionRepository.findById(petitionId)
-                .orElseThrow(() -> new PetitionNotFoundException(petitionId));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND));
 
         // 좋아요를 추가하거나 제거
         boolean isLiked = petition.toggleLike(memberId);
@@ -157,7 +153,7 @@ public class PetitionService {
     @Transactional
     public void deletePetitionById(Long petitionId) {
         if (!petitionRepository.existsById(petitionId)) {
-            throw new PetitionNotFoundException(petitionId);
+            throw new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND);
         }
         petitionRepository.deleteById(petitionId);
     }
@@ -179,9 +175,9 @@ public class PetitionService {
     @Transactional
     public void addInterest(InterestRequestDTO interestRequestDTO) {
         Petition petition = petitionRepository.findById(interestRequestDTO.getPetitionId())
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 청원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND));
         Member member = memberRepository.findById(interestRequestDTO.getMemberId())
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (!member.getInterestList().contains(interestRequestDTO.getPetitionId())) {
             petition.setInterestCount(petition.getInterestCount() + 1);
@@ -196,9 +192,9 @@ public class PetitionService {
     @Transactional
     public void removeInterest(InterestRequestDTO interestRequestDTO) {
         Petition petition = petitionRepository.findById(interestRequestDTO.getPetitionId())
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 청원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.PETITION_NOT_FOUND));
         Member member = memberRepository.findById(interestRequestDTO.getMemberId())
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member.getInterestList().contains(interestRequestDTO.getPetitionId())) {
             petition.setInterestCount(petition.getInterestCount() - 1);
@@ -217,7 +213,7 @@ public class PetitionService {
         return interestList.stream()
                 .map(petitionId -> {
                     Petition petition = petitionRepository.findById(petitionId)
-                            .orElseThrow(() -> new EntityNotFoundException("해당하는 청원ID를 찾을 수 없습니다 : " + petitionId));
+                            .orElseThrow(() -> new PetitionCustomException(ErrorCode.MEMBER_NOT_FOUND));
                     return new InterestPetitionResponseDTO(petition);
                 })
                 .collect(Collectors.toList());
