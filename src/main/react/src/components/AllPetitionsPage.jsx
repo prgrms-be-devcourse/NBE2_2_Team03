@@ -72,17 +72,24 @@ const AllPetitionsPage = () => {
                     throw new Error('네트워크 응답이 좋지 않습니다.');
                 }
 
-                const data = await response.json();
-                if (query) {
-                    setPetitions(data); // 검색 결과
-                    setTotalPages(Math.ceil(data.length / itemsPerPage));
+                const apiResponse = await response.json();
+                const { success, data, message } = apiResponse; // ApiResponse 구조에 맞게 구조 분해
+
+                if (success) {
+                    if (query) {
+                        setPetitions(data); // 검색 결과
+                        setTotalPages(Math.ceil(data.length / itemsPerPage));
+                    } else {
+                        setPetitions(data.content); // 전체 청원 목록
+                        setTotalPages(data.totalPages);
+                    }
                 } else {
-                    setPetitions(data.content); // 전체 청원 목록
-                    setTotalPages(data.totalPages);
+                    console.error('Error:', message); // 에러 처리
+                    setError(message); // 백엔드에서 받은 에러 메시지를 상태에 설정
                 }
             } catch (error) {
                 console.error('Error fetching petitions:', error);
-                setError('청원 데이터를 가져오는 데 실패했습니다.');
+                setError('청원 데이터를 가져오는 데 실패했습니다.'); // 일반적인 에러 메시지 설정
             } finally {
                 setIsLoading(false);
             }
@@ -106,12 +113,19 @@ const AllPetitionsPage = () => {
                 if (!response.ok) {
                     throw new Error('네트워크 응답이 좋지 않습니다.');
                 }
-                const data = await response.json();
-                setPetitions(data);
-                setTotalPages(Math.ceil(data.length / itemsPerPage));
+                const apiResponse = await response.json();
+                const { success, data, message } = apiResponse; // ApiResponse 구조에 맞게 구조 분해
+
+                if (success) {
+                    setPetitions(data); // 성공적으로 데이터가 있으면 전체 데이터 설정
+                    setTotalPages(Math.ceil(data.length / itemsPerPage));
+                } else {
+                    console.error('Error:', message); // 에러 처리
+                    setError(message); // 백엔드에서 받은 에러 메시지를 상태에 설정
+                }
             } catch (error) {
                 console.error('Error fetching petitions:', error);
-                setError('청원 검색에 실패했습니다.');
+                setError('청원 검색에 실패했습니다.'); // 일반적인 에러 메시지 설정
             } finally {
                 setIsLoading(false);
             }
@@ -123,9 +137,16 @@ const AllPetitionsPage = () => {
                     'Content-Type': 'application/json',
                 },
             });
-            const data = await response.json();
-            setPetitions(data.content);
-            setTotalPages(data.totalPages);
+            const apiResponse = await response.json();
+            const { success, data, message } = apiResponse; // ApiResponse 구조에 맞게 구조 분해
+
+            if (success) {
+                setPetitions(data.content);
+                setTotalPages(data.totalPages);
+            } else {
+                console.error('Error:', message);
+                setError(message);
+            }
         }
     };
 
@@ -200,7 +221,6 @@ const AllPetitionsPage = () => {
                 <ul>
                     {sortedPetitions().map((petition) => (
                         <li key={petition.petitionId} className="mb-4 p-4 bg-white rounded shadow">
-                            {/* 청원 제목을 클릭할 수 있도록 Link로 감싸기 */}
                             <Link to={`/petitions/${petition.petitionId}`} className="text-xl font-semibold text-gray-800 hover:underline">
                                 {petition.title}
                             </Link>
@@ -229,7 +249,7 @@ const AllPetitionsPage = () => {
                             onClick={() => handlePageChange(index)}
                             className={`mx-1 px-3 py-1 rounded ${currentPage === index ? 'bg-blue-600 text-white' : 'bg-gray-200 text-black hover:bg-blue-400'}`}
                         >
-                            {index + 1} {/* 페이지 번호 표시 */}
+                            {index + 1}
                         </button>
                     ))}
                 </div>
@@ -260,4 +280,3 @@ const AllPetitionsPage = () => {
 };
 
 export default AllPetitionsPage;
-
