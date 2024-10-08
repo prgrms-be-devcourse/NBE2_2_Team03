@@ -105,7 +105,10 @@ const MemberInfoPage = ({ user, setUser }) => {
     const avatarImagePath = user.avatar;
     const avatarFileName = avatarImagePath ? avatarImagePath.split('/').pop() : null;
     const defaultAvatarUrl = 'http://localhost:8000/images/default-avatar.png';
-    const avatarUrl = avatarImagePath ? `http://localhost:8000/${avatarFileName}` : defaultAvatarUrl;
+    // const avatarUrl = avatarImagePath ? `http://localhost:8000/${avatarFileName}` : defaultAvatarUrl;    // 기본 이미지 경로를 찾아오지 못해 수정
+    const avatarUrl = avatarImagePath && avatarImagePath.includes('default-avatar.png')
+        ? defaultAvatarUrl
+        : `http://localhost:8000/${avatarFileName}`;
 
     return (
         <div className="p-6">
