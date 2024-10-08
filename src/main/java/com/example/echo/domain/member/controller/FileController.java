@@ -1,8 +1,10 @@
 package com.example.echo.domain.member.controller;
 
+import com.example.echo.global.api.ApiResponse;
 import com.example.echo.global.exception.UploadException;
 import com.example.echo.global.util.UploadUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Log4j2
 @RequestMapping("/api/v1/files")
-@Tag(name = "File Controller", description = "파일 업로드 및 삭제 관리  API")
+@Tag(name = "File Controller", description = "파일 업로드 및 삭제 관리 API")
 public class FileController {
 
     private final UploadUtil uploadUtil;
@@ -25,8 +27,8 @@ public class FileController {
     // 파일 업로드
     @Operation(summary = "파일 업로드", description = "파일을 업로드합니다.")
     @PostMapping("/upload")
-    public ResponseEntity<List<String>> uploadFile(
-            @RequestParam("files") MultipartFile[] files) {
+    public ResponseEntity<ApiResponse<List<String>>> uploadFile(
+            @Parameter(description = "업로드할 파일", required = true) @RequestParam("files") MultipartFile[] files) {
         log.info("--- uploadFile() invoked ---");
 
         // 업로드 파일이 없는 경우
@@ -44,7 +46,8 @@ public class FileController {
         // 업로드 수행
         List<String> uploadedFiles = uploadUtil.upload(files);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(uploadedFiles);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(uploadedFiles));
     }
 
     // 업로드 파일 확장자 체크
@@ -64,19 +67,19 @@ public class FileController {
     // 파일 삭제
     @Operation(summary = "파일 삭제", description = "파일 이름으로 파일을 삭제합니다.")
     @DeleteMapping("/{filename}")
-    public ResponseEntity<?> fileDelete(@PathVariable String filename) {
+    public ResponseEntity<ApiResponse<String>> fileDelete(
+            @Parameter(description = "삭제할 파일 이름", required = true) @PathVariable String filename) {
         log.info("--- fileDelete() invoked for filename: " + filename);
 
         try {
             // UploadUtil 클래스의 deleteFile 메서드 호출
             uploadUtil.deleteFile(filename);
             log.info("파일이 성공적으로 삭제되었습니다: " + filename);
-            return ResponseEntity.ok("파일이 성공적으로 삭제되었습니다.");
+            return ResponseEntity.ok(ApiResponse.success("파일이 성공적으로 삭제되었습니다."));
         } catch (Exception e) {
             log.error("파일 삭제 중 오류 발생: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("파일 삭제에 실패했습니다: " + e.getMessage());
+                    .body(ApiResponse.error("파일 삭제에 실패했습니다: " + e.getMessage()));
         }
     }
-
 }
