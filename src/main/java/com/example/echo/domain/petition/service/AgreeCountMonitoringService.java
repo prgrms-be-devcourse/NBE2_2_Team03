@@ -15,7 +15,6 @@ public class AgreeCountMonitoringService {
 
     private final PetitionRepository petitionRepository;
     private final PetitionCrawlService petitionCrawlService;
-    private final PetitionService petitionService;
 
     @Scheduled(fixedRate = 600000) // 10분 마다 업데이트
     public void updateAgreeCountFromWeb() {

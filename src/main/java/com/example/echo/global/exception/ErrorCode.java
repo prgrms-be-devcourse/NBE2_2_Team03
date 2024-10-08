@@ -22,15 +22,9 @@ public enum ErrorCode {
 
     // Petition
     PETITION_NOT_FOUND(NOT_FOUND, "청원을 찾을 수 없습니다."),
-    PETITION_NOT_MATCHED(BAD_REQUEST, "청원 정보가 일치하지 않습니다."),
-    PETITION_NOT_REMOVED(CONFLICT, "청원 삭제에 실패했습니다."),
-    PETITION_NOT_REGISTERED(CONFLICT, "청원 등록에 실패했습니다."),
-    PETITION_NOT_MODIFIED(CONFLICT, "청원 수정에 실패했습니다."),
-
     SELENIUM_TIMEOUT(BAD_REQUEST, "크롤링 도중 시간 초과가 발생했습니다."),
     SELENIUM_NO_ELEMENT_FOUND(NOT_FOUND, "페이지에서 필요한 요소를 찾을 수 없습니다."),
     SELENIUM_UNKNOWN_ERROR(INTERNAL_SERVER_ERROR, "알 수 없는 크롤링 오류가 발생했습니다."),
-
 
     // Inquiry
     INQUIRY_NOT_FOUND(NOT_FOUND, "1:1 문의를 찾을 수 없습니다."),
