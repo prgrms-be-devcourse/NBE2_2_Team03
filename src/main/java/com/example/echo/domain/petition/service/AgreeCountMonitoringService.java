@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -16,6 +17,7 @@ public class AgreeCountMonitoringService {
     private final PetitionRepository petitionRepository;
     private final PetitionCrawlService petitionCrawlService;
 
+    @Transactional
     @Scheduled(fixedRate = 600000) // 10분 마다 업데이트
     public void updateAgreeCountFromWeb() {
         List<Petition> petitions = petitionRepository.findAllActive(); // 만료 전만 가져오기
