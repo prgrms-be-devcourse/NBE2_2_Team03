@@ -16,7 +16,6 @@ import com.example.echo.global.security.auth.CustomUserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +24,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/petitions")
@@ -39,7 +40,8 @@ public class PetitionController {
     @Operation(summary = "청원 등록", description = "새로운 청원을 등록합니다.")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> createPetition(@Parameter(description = "청원 등록 요청 정보", required = true) @RequestBody PetitionRequestDto petitionDto) {
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> createPetition(
+            @Parameter(description = "청원 등록 요청 정보", required = true) @RequestBody PetitionRequestDto petitionDto) {
         PetitionDetailResponseDto createdPetition = petitionService.createPetition(petitionDto);
         return ResponseEntity.ok(ApiResponse.success(createdPetition));
     }
@@ -47,7 +49,8 @@ public class PetitionController {
     // 청원 단건 조회
     @Operation(summary = "청원 단건 조회", description = "특정 ID의 청원을 조회합니다.")
     @GetMapping("/{petitionId}")
-    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> getPetitionById(@Parameter(description = "조회할 청원의 ID", required = true) @PathVariable Long petitionId) {
+    public ResponseEntity<ApiResponse<PetitionDetailResponseDto>> getPetitionById(
+            @Parameter(description = "조회할 청원의 ID", required = true) @PathVariable Long petitionId) {
         PetitionDetailResponseDto petition = petitionService.getPetitionById(petitionId);
         return ResponseEntity.ok(ApiResponse.success(petition));
     }
