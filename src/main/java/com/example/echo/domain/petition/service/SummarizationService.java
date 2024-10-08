@@ -36,7 +36,7 @@ public class SummarizationService {
         body.put("model", "gpt-3.5-turbo");
 
         List<Map<String, Object>> messages = new ArrayList<>();
-        messages.add(Map.of("role", "user", "content", "다음 국민청원을 요약하고 주요 포인트를 포함해 주세요: " + text));
+        messages.add(Map.of("role", "user", "content", "다음 국민청원을 요약하고 주요 포인트를 포함하여 완전한 문장으로 마무리되게 작성해 주세요: " + text));
 
         // body.put("prompt", "다음 텍스트를 요약해 주세요: " + text);
         body.put("messages", messages);
