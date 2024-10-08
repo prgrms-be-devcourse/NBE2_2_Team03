@@ -11,7 +11,8 @@ import lombok.Getter;
 @Builder
 public class MemberUpdateRequest {
 
-    @NotBlank(message = "이름은 필수 항목입니다.")
+    private String userId;
+
     private String name;
 
     @Email(message = "유효한 이메일 주소를 입력하세요.")
@@ -21,12 +22,16 @@ public class MemberUpdateRequest {
     @NotBlank(message = "전화번호는 필수 항목입니다.")
     private String phone;
 
+    private String avatarImage;
+
     private Role role;
 
     public void updateMember(Member member) {
-        member.setName(this.name);
+        if (userId != null) member.setUserId(this.userId);
+        if (name != null) member.setName(this.name);
         member.setEmail(this.email);
         member.setPhone(this.phone);
-        member.setRole(this.role);
+        member.setAvatarImage(this.avatarImage != null ? this.avatarImage : "/images/avatar-default.png");
+        if (role != null) member.setRole(this.role);
     }
 }
