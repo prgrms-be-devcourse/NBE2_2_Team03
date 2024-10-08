@@ -18,8 +18,18 @@ const ExpiringPetitions = () => {
                     console.error(`Error: ${response.status} ${response.statusText}`);
                     throw new Error('네트워크 응답이 좋지 않습니다.');
                 }
-                const data = await response.json();
-                setPetitions(data); // 전체 데이터 설정
+                // const data = await response.json();
+                // setPetitions(data); // 전체 데이터 설정
+                const apiResponse = await response.json();
+                const { success, data, message } = apiResponse; // ApiResponse 구조에 맞게 구조 분해
+
+                if (success) {
+                    setPetitions(data); // 성공적으로 데이터가 있으면 전체 데이터 설정
+                } else {
+                    console.error('Error:', message); // 에러 처리
+                    setError(message); // 백엔드에서 받은 에러 메시지를 상태에 설정
+                }
+
             } catch (error) {
                 console.error('Error fetching expiring petitions:', error);
                 setError('청원 데이터를 가져오는 데 실패했습니다.');
