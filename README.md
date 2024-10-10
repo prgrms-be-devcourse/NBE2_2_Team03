@@ -175,7 +175,7 @@
 </details>
 <details>
   <summary>📦 ERD 구조 </summary>
-![echo_ERD](https://github.com/user-attachments/assets/85a72517-dcfb-4f94-a96d-c5bf90a65072)
+<img alt="echo_ERD" src="https://github.com/user-attachments/assets/85a72517-dcfb-4f94-a96d-c5bf90a65072">
 </details>
 
 <br>
