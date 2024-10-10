@@ -172,7 +172,8 @@
 </details>
 <details>
   <summary>📦 ERD 구조 </summary>
-내용
+![echo_ERD](https://github.com/user-attachments/assets/19ba682b-f0b8-4efe-9935-c6b73b130842)
+
   </details>
 
 <br>
