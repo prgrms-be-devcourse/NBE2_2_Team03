@@ -1,0 +1,26 @@
+/* Header.css */
+.header {
+    background-color: #1e3a8a; /* Tailwind의 bg-blue-600에 해당하는 색상 */
+    color: white;
+    border-radius: 0.5rem; /* rounded-lg */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 추가 */
+}
+
+/* 추가적인 스타일을 원하신다면 여기에 작성 */
+.header h1 {
+    font-size: 2rem; /* 제목 크기 설정 */
+    font-weight: bold; /* 제목 두께 설정 */
+}
+
+.header button {
+    border-radius: 8px;
+    padding: 0.6em 1.2em;
+    background-color: #1a1a1a;
+    color: white;
+    cursor: pointer;
+    transition: border-color 0.25s;
+}
+
+.header button:hover {
+    border-color: #646cff; /* hover 효과 */
+}

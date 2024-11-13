@@ -1,0 +1,23 @@
+/* App.css */
+html, body, #root {
+  height: 100%;
+  margin: 0; /* 기본 마진 제거 */
+  padding: 0; /* 기본 패딩 제거 */
+}
+
+/* App 컴포넌트의 스타일 조정 */
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 전체 화면 높이 */
+}
+
+.App-header {
+  background-color: #282c34; /* 헤더 배경색 */
+  min-height: 60px; /* 헤더의 최소 높이 */
+  display: flex;
+  align-items: center; /* 중앙 정렬 */
+  justify-content: space-between; /* 좌우 정렬 */
+  padding: 0 2rem; /* 좌우 패딩 */
+  color: white;
+}
